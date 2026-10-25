@@ -1,6 +1,11 @@
 # Afterschool
 
-a local games portal with a dark, minimal theme.
+![last commit](https://img.shields.io/github/last-commit/dav256/afterschool?style=for-the-badge)
+![repo size](https://img.shields.io/github/repo-size/dav256/afterschool?style=for-the-badge)
+
+> ### A local games portal with a dark, minimal theme
+
+Afterschool is a local games portal — Retro Bowl and 2048 are included, and more games drop in as folders.
 
 ## included
 
