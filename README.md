@@ -1,4 +1,4 @@
-# Afterschool
+<h1><img src="icon.svg" width="52" alt="Afterschool gamepad icon"> Afterschool</h1>
 
 ![last commit](https://img.shields.io/github/last-commit/dav256/afterschool?style=for-the-badge) ![repo size](https://img.shields.io/github/repo-size/dav256/afterschool?style=for-the-badge) ![GitHub stars](https://img.shields.io/github/stars/dav256/afterschool?style=for-the-badge&logo=github) ![HTML](https://img.shields.io/badge/HTML-E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-663399?style=for-the-badge&logo=css&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
