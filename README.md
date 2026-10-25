@@ -8,15 +8,15 @@
 
 It is designed to run locally: open the page, choose a game, or use the in-page admin to add, remove, and reorder entries.
 
-## included
+## Included
 
 - **Retro Bowl** — full game files under `games/retro-bowl/`
 - **2048** — full local code under `games/2048/`
 
-## add a game
+## Add a Game
 
-drop the game folder into `games/<name>/` so the path matches (e.g. `games/slope/index.html`), or use the in-page admin to add, remove, or reorder games.
+Drop the game folder into `games/<name>/` so the path matches (e.g. `games/slope/index.html`), or use the in-page admin to add, remove, or reorder games.
 
-## run
+## Run
 
-open `index.html` or `npx serve .`
+Open `index.html` or `npx serve .`
