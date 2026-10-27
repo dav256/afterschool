@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asteroids — Afterschool</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0d100e;color:#e8f0e9;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:18px 12px}
+  .panel{background:#151a16;border:1px solid #232b24;border-radius:16px;padding:16px;width:100%;max-width:900px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .topbar h1{font-size:1.05rem;margin:0;font-weight:700}
+  a.back{color:#7dffa3;text-decoration:none;font-size:.95rem;white-space:nowrap}
+  button{background:#7dffa3;color:#0d100e;border:0;border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:.9rem}
+  button:hover{filter:brightness(1.08)}
+  .score{font-size:1rem;margin:2px 0 10px}
+  .score b{color:#7dffa3}
+  .hint{color:#93a396;font-size:.85rem;margin-top:10px;text-align:center}
+  .stage{position:relative}
+  canvas{display:block;width:100%;height:auto;background:#070907;border:1px solid #232b24;border-radius:12px;touch-action:none}
+  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(6,10,7,.72);border-radius:12px;text-align:center;padding:16px}
+  .overlay.show{display:flex}
+  .overlay h2{margin:0;font-size:1.6rem}
+  .overlay p{margin:0;color:#93a396}
+  .touchrow{display:none;gap:10px;margin-top:12px;justify-content:center}
+  @media(pointer:coarse){.touchrow{display:flex}}
+  .touchrow button{flex:1;padding:12px}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="topbar">
+    <a class="back" href="../../index.html">&larr; Afterschool</a>
+    <h1>Asteroids</h1>
+    <button id="restartBtn" type="button">Restart</button>
+  </div>
+  <div class="score" id="score">Score: <b>0</b> &middot; Lives: <b>3</b> &middot; Wave: <b>1</b></div>
+  <div class="stage">
+    <canvas id="c" width="860" height="600"></canvas>
+    <div class="overlay show" id="ov">
+      <h2 id="ovTitle">Asteroids</h2>
+      <p id="ovText">Blast the rocks. Big ones split in two — don't get hit!</p>
+      <button id="ovBtn" type="button">Start</button>
+    </div>
+  </div>
+  <div class="touchrow">
+    <button data-k="left" type="button">&larr; Turn</button>
+    <button data-k="thrust" type="button">&uarr; Thrust</button>
+    <button data-k="right" type="button">Turn &rarr;</button>
+    <button data-k="fire" type="button">Fire</button>
+  </div>
+  <div class="hint">Controls: &larr; &rarr; rotate &middot; &uarr; thrust &middot; Space to fire &middot; Tap Fire on touch screens</div>
+</div>
+<script>
+(function(){
+  var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height;
+  var scoreEl=document.getElementById('score');
+  var ov=document.getElementById('ov'),ovTitle=document.getElementById('ovTitle'),
+      ovText=document.getElementById('ovText'),ovBtn=document.getElementById('ovBtn');
+  var best=parseInt(localStorage.getItem('astBest')||'0',10)||0;
+  var ship,bullets,rocks,score,lives,wave,state,cool,invuln,stars;
+  var keys={left:false,right:false,thrust:false,fire:false};
+  function reset(){
+    score=0;lives=3;wave=1;bullets=[];rocks=[];
+    stars=[];
+    for(var i=0;i<70;i++)stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.3});
+    resetShip();
+    spawnWave();
+    state='ready';
+    showOv('Asteroids','Blast the rocks. Big ones split in two — don\'t get hit!','Start');
+    renderScore();draw();
+  }
+  function resetShip(){
+    ship={x:W/2,y:H/2,vx:0,vy:0,a:-Math.PI/2,r:11};
+    invuln=150;cool=0;
+  }
+  function renderScore(){
+    scoreEl.innerHTML='Score: <b>'+score+'</b> &middot; Lives: <b>'+lives+'</b> &middot; Wave: <b>'+wave+'</b> &middot; Best: <b>'+best+'</b>';
+  }
+  function showOv(t,s,b){ovTitle.textContent=t;ovText.textContent=s;ovBtn.textContent=b;ov.classList.add('show');}
+  function hideOv(){ov.classList.remove('show');}
+  function start(){reset();state='play';hideOv();}
+  function gameOver(){
+    state='over';
+    if(score>best){best=score;localStorage.setItem('astBest',String(best));}
+    renderScore();
+    showOv('Game Over','You scored '+score+'. Best: '+best+'.','Play Again');
+  }
+  function makeRock(x,y,r){
+    var verts=[],n=10;
+    for(var i=0;i<n;i++){
+      verts.push({a:(i/n)*Math.PI*2,d:r*(0.74+Math.random()*0.42)});
+    }
+    var sp=r>30?0.7+Math.random()*0.7:1+Math.random()*1.1;
+    var dir=Math.random()*Math.PI*2;
+    return {x:x,y:y,vx:Math.cos(dir)*sp,vy:Math.sin(dir)*sp,r:r,verts:verts,
+            rot:Math.random()*Math.PI*2,vr:(Math.random()-0.5)*0.02};
+  }
+  function spawnWave(){
+    var n=3+wave;
+    for(var i=0;i<n;i++){
+      var x,y,tries=0;
+      do{x=Math.random()*W;y=Math.random()*H;tries++;}
+      while(Math.hypot(x-ship.x,y-ship.y)<170&&tries<20);
+      rocks.push(makeRock(x,y,46));
+    }
+  }
+  function wrap(o){
+    if(o.x<-55)o.x+=W+110;if(o.x>W+55)o.x-=W+110;
+    if(o.y<-55)o.y+=H+110;if(o.y>H+55)o.y-=H+110;
+  }
+  function fire(){
+    var nx=ship.x+Math.cos(ship.a)*16,ny=ship.y+Math.sin(ship.a)*16;
+    bullets.push({x:nx,y:ny,vx:Math.cos(ship.a)*9+ship.vx*0.4,vy:Math.sin(ship.a)*9+ship.vy*0.4,life:52});
+    cool=9;
+  }
+  function step(dt){
+    if(state!=='play'){draw();return;}
+    // ship
+    if(keys.left)ship.a-=0.085*dt;
+    if(keys.right)ship.a+=0.085*dt;
+    if(keys.thrust){
+      ship.vx+=Math.cos(ship.a)*0.17*dt;
+      ship.vy+=Math.sin(ship.a)*0.17*dt;
+    }
+    var fr=Math.pow(0.99,dt);
+    ship.vx*=fr;ship.vy*=fr;
+    var spd=Math.hypot(ship.vx,ship.vy);
+    if(spd>7){ship.vx=ship.vx/spd*7;ship.vy=ship.vy/spd*7;}
+    ship.x+=ship.vx*dt;ship.y+=ship.vy*dt;
+    wrap(ship);
+    if(invuln>0)invuln-=dt;
+    // firing
+    if(cool>0)cool-=dt;
+    if(keys.fire&&cool<=0)fire();
+    // bullets
+    for(var i=bullets.length-1;i>=0;i--){
+      var b=bullets[i];
+      b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;
+      if(b.life<=0||b.x<0||b.x>W||b.y<0||b.y>H){bullets.splice(i,1);}
+    }
+    // rocks
+    for(var j=0;j<rocks.length;j++){
+      var r=rocks[j];
+      r.x+=r.vx*dt;r.y+=r.vy*dt;r.rot+=r.vr*dt;
+      wrap(r);
+    }
+    // bullet vs rock
+    for(var bi=bullets.length-1;bi>=0;bi--){
+      var hit=false;
+      for(var ri=rocks.length-1;ri>=0;ri--){
+        var rk=rocks[ri];
+        if(Math.hypot(bullets[bi].x-rk.x,bullets[bi].y-rk.y)<rk.r+3){
+          hit=true;
+          score+=rk.r>30?20:(rk.r>18?50:100);
+          if(rk.r>15){
+            rocks.push(makeRock(rk.x,rk.y,rk.r>30?26:14));
+            rocks.push(makeRock(rk.x,rk.y,rk.r>30?26:14));
+          }
+          rocks.splice(ri,1);
+          renderScore();
+          break;
+        }
+      }
+      if(hit)bullets.splice(bi,1);
+    }
+    // ship vs rock
+    if(invuln<=0){
+      for(var k=0;k<rocks.length;k++){
+        var q=rocks[k];
+        if(Math.hypot(ship.x-q.x,ship.y-q.y)<q.r*0.85+ship.r){
+          lives--;renderScore();
+          if(lives<=0){gameOver();draw();return;}
+          resetShip();
+          break;
+        }
+      }
+    }
+    // wave clear
+    if(rocks.length===0){
+      wave++;renderScore();
+      resetShip();
+      spawnWave();
+    }
+    draw();
+  }
+  function draw(){
+    ctx.fillStyle='#070907';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#3d4a3f';
+    for(var i=0;i<stars.length;i++){ctx.fillRect(stars[i].x,stars[i].y,stars[i].r,stars[i].r);}
+    // rocks
+    ctx.strokeStyle='#cfe6d2';ctx.lineWidth=2;
+    for(var j=0;j<rocks.length;j++){
+      var r=rocks[j];
+      ctx.beginPath();
+      for(var v=0;v<r.verts.length;v++){
+        var p=r.verts[v],px=r.x+Math.cos(p.a+r.rot)*p.d,py=r.y+Math.sin(p.a+r.rot)*p.d;
+        if(v===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+      }
+      ctx.closePath();ctx.stroke();
+    }
+    // bullets
+    ctx.fillStyle='#7dffa3';
+    for(var b=0;b<bullets.length;b++){
+      ctx.beginPath();ctx.arc(bullets[b].x,bullets[b].y,3,0,Math.PI*2);ctx.fill();
+    }
+    // ship (blink while invulnerable)
+    if(!(invuln>0&&Math.floor(invuln/8)%2===0)){
+      ctx.save();
+      ctx.translate(ship.x,ship.y);ctx.rotate(ship.a);
+      if(keys.thrust&&state==='play'){
+        ctx.fillStyle='#ff9d45';
+        ctx.beginPath();
+        ctx.moveTo(-10,5);ctx.lineTo(-19,0);ctx.lineTo(-10,-5);ctx.closePath();ctx.fill();
+      }
+      ctx.strokeStyle='#7dffa3';ctx.lineWidth=2;
+      ctx.beginPath();
+      ctx.moveTo(16,0);ctx.lineTo(-11,10);ctx.lineTo(-6,0);ctx.lineTo(-11,-10);
+      ctx.closePath();ctx.stroke();
+      ctx.restore();
+    }
+  }
+  var last=0;
+  function loop(t){
+    var dt=last?Math.min(2.5,(t-last)/16.667):1;
+    last=t;step(dt);
+    requestAnimationFrame(loop);
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.code==='ArrowLeft'){e.preventDefault();keys.left=true;}
+    else if(e.code==='ArrowRight'){e.preventDefault();keys.right=true;}
+    else if(e.code==='ArrowUp'){e.preventDefault();keys.thrust=true;}
+    else if(e.code==='Space'){e.preventDefault();keys.fire=true;}
+  });
+  document.addEventListener('keyup',function(e){
+    if(e.code==='ArrowLeft')keys.left=false;
+    else if(e.code==='ArrowRight')keys.right=false;
+    else if(e.code==='ArrowUp')keys.thrust=false;
+    else if(e.code==='Space')keys.fire=false;
+  });
+  cv.addEventListener('pointerdown',function(e){
+    e.preventDefault();
+    if(state==='ready'){state='play';hideOv();}
+    keys.fire=true;
+  });
+  cv.addEventListener('pointerup',function(){keys.fire=false;});
+  cv.addEventListener('pointerleave',function(){keys.fire=false;});
+  var tbtns=document.querySelectorAll('.touchrow button');
+  for(var i=0;i<tbtns.length;i++){
+    (function(btn){
+      var k=btn.getAttribute('data-k');
+      btn.addEventListener('pointerdown',function(e){
+        e.preventDefault();
+        if(state==='ready'){state='play';hideOv();}
+        keys[k]=true;
+      });
+      btn.addEventListener('pointerup',function(){keys[k]=false;});
+      btn.addEventListener('pointerleave',function(){keys[k]=false;});
+    })(tbtns[i]);
+  }
+  ovBtn.addEventListener('click',start);
+  document.getElementById('restartBtn').addEventListener('click',reset);
+  reset();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

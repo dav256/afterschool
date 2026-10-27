@@ -4,7 +4,7 @@
 
 ![last commit](https://img.shields.io/github/last-commit/dav256/afterschool?style=for-the-badge) ![repo size](https://img.shields.io/github/repo-size/dav256/afterschool?style=for-the-badge) ![GitHub stars](https://img.shields.io/github/stars/dav256/afterschool?style=for-the-badge&logo=github) ![HTML](https://img.shields.io/badge/HTML-E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-663399?style=for-the-badge&logo=css&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-> **Ready to play:** Retro Bowl and 2048 are included, and more games can be added as folders.
+> **Ready to play:** Fourteen games are included and playable, and more can be added as folders.
 
 **Afterschool is a local games portal with a dark, minimal theme.**
 
@@ -12,8 +12,30 @@ It is designed to run locally: open the page, choose a game, or use the in-page 
 
 ## Included
 
-- **Retro Bowl** — full game files under `games/retro-bowl/`
-- **2048** — full local code under `games/2048/`
+- **Retro Bowl** — Sports · full game files under `games/retro-bowl/`
+- **2048** — Puzzle · the original open-source 2048 (see Credits)
+- **Snake** — Arcade
+- **Tetris** — Puzzle
+- **Flappy Bird** — Arcade
+- **Chrome Dino** — Arcade · the T-Rex runner (see Credits)
+- **Pong** — Arcade
+- **Breakout** — Arcade
+- **Minesweeper** — Puzzle
+- **Wordle** — Puzzle · open-source word game (see Credits)
+- **Memory Match** — Casual
+- **Simon** — Casual
+- **Tic-Tac-Toe** — Multiplayer · vs computer or 2 players
+- **Asteroids** — Action
+
+## Credits
+
+Some games are adapted from open-source projects on GitHub, with their licenses kept in each game folder:
+
+- **2048** by Gabriele Cirulli — MIT License (`games/2048/LICENSE.txt`)
+- **Wordle** based on the open-source clone by WebDevSimplified — MIT License (`games/wordle/LICENSE`)
+- **Chrome Dino** from wayou/t-rex-runner, based on Chromium's T-Rex Runner — BSD 3-Clause License (`games/dino-dash/LICENSE`)
+
+The remaining games were written for this repo.
 
 ## Add a Game
 

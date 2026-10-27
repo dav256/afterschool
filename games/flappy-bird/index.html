@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flappy Wing — Afterschool</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0d100e;color:#e8f0e9;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:18px 12px}
+  .panel{background:#151a16;border:1px solid #232b24;border-radius:16px;padding:16px;width:100%;max-width:460px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .topbar h1{font-size:1.05rem;margin:0;font-weight:700}
+  a.back{color:#7dffa3;text-decoration:none;font-size:.95rem;white-space:nowrap}
+  button{background:#7dffa3;color:#0d100e;border:0;border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:.9rem}
+  button:hover{filter:brightness(1.08)}
+  .score{font-size:1rem;margin:2px 0 10px;color:#e8f0e9}
+  .score b{color:#7dffa3}
+  .hint{color:#93a396;font-size:.85rem;margin-top:10px;text-align:center}
+  .stage{position:relative}
+  canvas{display:block;width:100%;height:auto;background:#0a0f0c;border:1px solid #232b24;border-radius:12px;touch-action:none}
+  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(6,10,7,.72);border-radius:12px;text-align:center;padding:16px}
+  .overlay.show{display:flex}
+  .overlay h2{margin:0;font-size:1.6rem}
+  .overlay p{margin:0;color:#93a396}
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="topbar">
+    <a class="back" href="../../index.html">&larr; Afterschool</a>
+    <h1>Flappy Wing</h1>
+    <button id="restartBtn" type="button">Restart</button>
+  </div>
+  <div class="score" id="score">Score: <b>0</b> &middot; Best: <b>0</b></div>
+  <div class="stage">
+    <canvas id="c" width="420" height="600"></canvas>
+    <div class="overlay show" id="ov">
+      <h2 id="ovTitle">Flappy Wing</h2>
+      <p id="ovText">Tap, click, or press Space to flap. Dodge the pipes!</p>
+      <button id="ovBtn" type="button">Start</button>
+    </div>
+  </div>
+  <div class="hint">Controls: Space / &uarr; / Click / Tap to flap</div>
+</div>
+<script>
+(function(){
+  var cv=document.getElementById('c'),ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height,GROUND=34;
+  var scoreEl=document.getElementById('score');
+  var ov=document.getElementById('ov'),ovTitle=document.getElementById('ovTitle'),
+      ovText=document.getElementById('ovText'),ovBtn=document.getElementById('ovBtn');
+  var best=parseInt(localStorage.getItem('flappyBest')||'0',10)||0;
+  var bird,pipes,score,frame,state;
+  function reset(){
+    bird={x:96,y:H/2,vy:0,r:17};
+    pipes=[];score=0;frame=0;state='ready';
+    showOv('Flappy Wing','Tap, click, or press Space to flap. Dodge the pipes!','Start');
+    renderScore();draw();
+  }
+  function renderScore(){scoreEl.innerHTML='Score: <b>'+score+'</b> &middot; Best: <b>'+best+'</b>';}
+  function showOv(t,s,b){ovTitle.textContent=t;ovText.textContent=s;ovBtn.textContent=b;ov.classList.add('show');}
+  function hideOv(){ov.classList.remove('show');}
+  function start(){reset();state='play';hideOv();}
+  function gameOver(){
+    state='over';
+    if(score>best){best=score;localStorage.setItem('flappyBest',String(best));}
+    renderScore();
+    showOv('Game Over','You scored '+score+'. Best: '+best+'.','Play Again');
+  }
+  function flap(){
+    if(state==='ready'){state='play';hideOv();}
+    if(state==='play'){bird.vy=-8.4;}
+  }
+  function spawnPipe(){
+    var gap=172,minTop=70,maxTop=H-GROUND-gap-70;
+    var top=minTop+Math.random()*(maxTop-minTop);
+    pipes.push({x:W+12,top:top,gap:gap,w:72,passed:false});
+  }
+  function step(dt){
+    frame+=dt;
+    if(state==='ready'){bird.y=H/2+Math.sin(frame*0.09)*7;draw();return;}
+    if(state!=='play'){draw();return;}
+    bird.vy+=0.45*dt;bird.y+=bird.vy*dt;
+    if(!pipes.length||pipes[pipes.length-1].x<W-250)spawnPipe();
+    for(var i=pipes.length-1;i>=0;i--){
+      var p=pipes[i];p.x-=2.6*dt;
+      if(!p.passed&&p.x+p.w<bird.x-bird.r){p.passed=true;score++;renderScore();}
+      if(p.x+p.w<-20)pipes.splice(i,1);
+    }
+    if(bird.y+bird.r>=H-GROUND){bird.y=H-GROUND-bird.r;gameOver();draw();return;}
+    if(bird.y-bird.r<0){bird.y=bird.r;bird.vy=0;}
+    for(var j=0;j<pipes.length;j++){
+      var q=pipes[j];
+      if(bird.x+bird.r-3>q.x&&bird.x-bird.r+3<q.x+q.w){
+        if(bird.y-bird.r+3<q.top||bird.y+bird.r-3>q.top+q.gap){gameOver();draw();return;}
+      }
+    }
+    draw();
+  }
+  function drawPipe(p){
+    ctx.fillStyle='#2e8b57';
+    ctx.fillRect(p.x,0,p.w,p.top);
+    ctx.fillRect(p.x, p.top+p.gap,p.w,H-GROUND-(p.top+p.gap));
+    ctx.fillStyle='#3cb371';
+    ctx.fillRect(p.x-4,p.top-26,p.w+8,26);
+    ctx.fillRect(p.x-4,p.top+p.gap,p.w+8,26);
+    ctx.strokeStyle='#1d5c38';ctx.lineWidth=2;
+    ctx.strokeRect(p.x-4,p.top-26,p.w+8,26);
+    ctx.strokeRect(p.x-4,p.top+p.gap,p.w+8,26);
+  }
+  function draw(){
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#0e1a12');g.addColorStop(1,'#0a0f0c');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    for(var i=0;i<pipes.length;i++)drawPipe(pipes[i]);
+    ctx.fillStyle='#1c2a1e';ctx.fillRect(0,H-GROUND,W,GROUND);
+    ctx.fillStyle='#7dffa3';ctx.fillRect(0,H-GROUND,W,3);
+    ctx.save();
+    ctx.translate(bird.x,bird.y);
+    var tilt=Math.max(-0.4,Math.min(1.1,bird.vy*0.05));
+    ctx.rotate(state==='play'?tilt:0);
+    var wingY=Math.sin(frame*0.55)*3;
+    ctx.fillStyle='#f2a93b';
+    ctx.beginPath();ctx.ellipse(-6,2+wingY,10,6,-0.4,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ffcf5c';
+    ctx.beginPath();ctx.arc(0,0,bird.r,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ff8c42';
+    ctx.beginPath();ctx.moveTo(13,-3);ctx.lineTo(24,1);ctx.lineTo(13,5);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#ffffff';
+    ctx.beginPath();ctx.arc(7,-6,5.5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#14231a';
+    ctx.beginPath();ctx.arc(8.5,-6,2.6,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+  var last=0;
+  function loop(t){
+    var dt=last?Math.min(2.5,(t-last)/16.667):1;
+    last=t;step(dt);
+    requestAnimationFrame(loop);
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();flap();}
+  });
+  cv.addEventListener('pointerdown',function(e){e.preventDefault();flap();});
+  ovBtn.addEventListener('click',start);
+  document.getElementById('restartBtn').addEventListener('click',reset);
+  reset();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

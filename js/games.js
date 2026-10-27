@@ -10,4 +10,8 @@ const DEFAULT_GAMES = [
   { id:"breakout", name:"Breakout", category:"Arcade", path:"games/breakout/index.html", note:"Local", icon:"🧱", color:"#f87171" },
   { id:"minesweeper", name:"Minesweeper", category:"Puzzle", path:"games/minesweeper/index.html", note:"Local", icon:"💣", color:"#64748b" },
   { id:"wordle", name:"Wordle", category:"Puzzle", path:"games/wordle/index.html", note:"Local", icon:"🔤", color:"#65a30d" },
+  { id:"memory-match", name:"Memory Match", category:"Casual", path:"games/memory-match/index.html", note:"Local", icon:"🧠", color:"#f472b6" },
+  { id:"simon", name:"Simon", category:"Casual", path:"games/simon/index.html", note:"Local", icon:"🎵", color:"#818cf8" },
+  { id:"tic-tac-toe", name:"Tic-Tac-Toe", category:"Multiplayer", path:"games/tic-tac-toe/index.html", note:"Local · 1–2 players", icon:"⭕", color:"#38bdf8" },
+  { id:"asteroids", name:"Asteroids", category:"Action", path:"games/asteroids/index.html", note:"Local", icon:"🚀", color:"#e2e8f0" },
 ];
