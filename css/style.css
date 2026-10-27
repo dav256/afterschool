@@ -111,3 +111,19 @@ code{font-size:0.85em;background:var(--surface-2);padding:2px 6px;border-radius:
 .admin-list .rm{color:#ff7a7a;font-size:0.8rem;padding:4px 8px}
 .admin-list .rm:hover{text-decoration:underline}
 @media(max-width:800px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--border)}.main{padding:18px 14px 48px}.featured{grid-template-columns:1fr}}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.modal-card{max-width:560px}
+input[type="checkbox"]{width:auto;accent-color:var(--accent)}
+.card-thumb .fav{position:absolute;top:6px;right:8px;font-size:1.05rem;line-height:1;color:#ffd166;text-shadow:0 1px 6px rgba(0,0,0,0.6);cursor:pointer;opacity:0.55;transition:0.15s;z-index:2}
+.card-thumb .fav:hover{opacity:1;transform:scale(1.2)}
+.card-thumb .fav.active{opacity:1}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatch{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);padding:0}
+.swatch:hover{transform:scale(1.1)}
+.swatch.active{border-color:#fff}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.preset{padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);font-size:0.88rem;font-weight:500;color:var(--text);text-align:left;transition:0.15s}
+.preset:hover{border-color:var(--accent)}
+.preset.active{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.row{display:flex;gap:8px;align-items:center}
+.btn.danger:hover{background:#ff7a7a;border-color:#ff7a7a;color:#050806}

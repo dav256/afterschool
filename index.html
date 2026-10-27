@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Afterschool</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
@@ -12,12 +13,13 @@
 <body>
   <div class="app">
     <aside class="sidebar">
-      <a href="/" class="logo">afterschool</a>
+      <a href="./" class="logo">afterschool</a>
       <nav class="nav">
         <div class="nav-group">
           <div class="nav-label">Explore</div>
           <button class="nav-item active" data-filter="all">All games <span class="count" id="total-count">0</span></button>
           <button class="nav-item" data-filter="popular">Popular</button>
+          <button class="nav-item" data-filter="favorites">Favorites</button>
           <button class="nav-item" id="btn-random">Surprise me</button>
         </div>
         <div class="nav-group">
@@ -34,17 +36,21 @@
         <div class="nav-group">
           <div class="nav-label">Admin</div>
           <button class="nav-item" id="btn-admin">Admin panel</button>
+          <button class="nav-item" id="btn-cloak-nav">Tab cloak</button>
         </div>
       </nav>
     </aside>
 
     <main class="main">
-      <p class="tagline">Local games only. No external embeds.</p>
+      <p class="tagline" id="tagline">Local games only. No external embeds.</p>
       <section class="hero">
         <p class="hero-label">School's out</p>
         <h1>Afterschool</h1>
         <p class="hero-desc">Games run from folders on this site. Drop any GitHub HTML5 game into <code>games/</code> and add it in admin.</p>
-        <button class="btn" id="btn-hero-random">Pick a random game</button>
+        <div class="hero-actions">
+          <button class="btn" id="btn-hero-random">Pick a random game</button>
+          <button class="btn btn-ghost" id="btn-quick-cloak">Quick cloak</button>
+        </div>
       </section>
 
       <section class="featured" id="featured"></section>
@@ -53,7 +59,7 @@
         <div class="section-head">
           <div>
             <h2>All games</h2>
-            <p>Opens the local game folder.</p>
+            <p>Opens the local game folder. Star a game to pin it to Favorites.</p>
           </div>
           <span id="showing-count" class="muted"></span>
         </div>
@@ -92,10 +98,11 @@
         <div class="admin-tabs">
           <button class="admin-tab active" data-tab="games">Games</button>
           <button class="admin-tab" data-tab="add">Add game</button>
-          <button class="admin-tab" data-tab="style">Style</button>
+          <button class="admin-tab" data-tab="style">Site</button>
+          <button class="admin-tab" data-tab="cloak">Cloak</button>
         </div>
         <div id="tab-games" class="admin-tab-content">
-          <p class="muted" style="margin-bottom:10px">Drag to reorder. Remove deletes from the list only.</p>
+          <p class="muted" style="margin-bottom:10px">Drag to reorder. Remove deletes from the list only. Play counts are tracked on this device.</p>
           <ul id="admin-game-list" class="admin-list"></ul>
         </div>
         <div id="tab-add" class="admin-tab-content" hidden>
@@ -116,11 +123,51 @@
           <button class="btn" id="add-save" style="margin-top:16px;width:100%">Add game</button>
         </div>
         <div id="tab-style" class="admin-tab-content" hidden>
-          <label>Accent color</label>
+          <label>Theme</label>
+          <div class="swatches" id="style-swatches">
+            <button class="swatch" data-accent="#7dffa3" style="background:#7dffa3" title="Mint"></button>
+            <button class="swatch" data-accent="#6ec3ff" style="background:#6ec3ff" title="Sky"></button>
+            <button class="swatch" data-accent="#b78cff" style="background:#b78cff" title="Grape"></button>
+            <button class="swatch" data-accent="#ffb86e" style="background:#ffb86e" title="Sunset"></button>
+            <button class="swatch" data-accent="#ff8fb3" style="background:#ff8fb3" title="Bubble"></button>
+            <button class="swatch" data-accent="#ff8f8f" style="background:#ff8f8f" title="Ember"></button>
+          </div>
+          <label style="margin-top:14px">Accent color</label>
           <input type="color" id="style-accent" value="#7dffa3" />
           <label style="margin-top:12px">Site name</label>
           <input type="text" id="style-name" value="afterschool" />
+          <label style="margin-top:12px">Tagline</label>
+          <input type="text" id="style-tagline" value="Local games only. No external embeds." />
           <button class="btn" id="style-save" style="margin-top:16px;width:100%">Save style</button>
+          <label style="margin-top:20px">Library data</label>
+          <p class="muted" style="margin-bottom:10px">Back up your games list, favorites, cloak settings, and play counts — or wipe everything back to defaults.</p>
+          <div class="row">
+            <button class="btn btn-ghost" id="data-export" style="flex:1">Export</button>
+            <button class="btn btn-ghost" id="data-import-btn" style="flex:1">Import</button>
+            <button class="btn btn-ghost danger" id="data-reset" style="flex:1">Reset all</button>
+          </div>
+          <input type="file" id="data-import" accept="application/json" hidden />
+        </div>
+        <div id="tab-cloak" class="admin-tab-content" hidden>
+          <label>Tab disguise</label>
+          <p class="muted" style="margin-bottom:10px">Changes this tab's title and icon so it looks like schoolwork. Applies instantly and sticks on this device.</p>
+          <div class="preset-grid" id="cloak-presets"></div>
+          <label style="margin-top:14px">Custom tab title</label>
+          <input type="text" id="cloak-title" placeholder="e.g. Essay draft - Google Docs" />
+          <label style="margin-top:12px"><input type="checkbox" id="cloak-auto" /> Auto-cloak when the site loads</label>
+          <label style="margin-top:16px">Panic key</label>
+          <p class="muted" style="margin-bottom:8px">Press it anytime to jump straight to a safe page.</p>
+          <div class="row">
+            <select id="cloak-panic-key" style="flex:1">
+              <option value="`">Backtick ( ` )</option>
+              <option value="p">P</option>
+              <option value="x">X</option>
+            </select>
+            <input type="text" id="cloak-panic-url" style="flex:2" value="https://classroom.google.com/" />
+          </div>
+          <label style="margin-top:16px">Stealth open</label>
+          <p class="muted" style="margin-bottom:8px">Opens the whole portal inside an about:blank tab, so the address bar and history stay clean.</p>
+          <button class="btn" id="btn-blank" style="width:100%">Open in about:blank</button>
         </div>
         <button class="btn btn-ghost" id="admin-logout" style="margin-top:20px;width:100%">Logout</button>
       </div>
