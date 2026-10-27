@@ -14,4 +14,8 @@ const DEFAULT_GAMES = [
   { id:"simon", name:"Simon", category:"Casual", path:"games/simon/index.html", note:"Local", icon:"🎵", color:"#818cf8" },
   { id:"tic-tac-toe", name:"Tic-Tac-Toe", category:"Multiplayer", path:"games/tic-tac-toe/index.html", note:"Local · 1–2 players", icon:"⭕", color:"#38bdf8" },
   { id:"asteroids", name:"Asteroids", category:"Action", path:"games/asteroids/index.html", note:"Local", icon:"🚀", color:"#e2e8f0" },
+  { id:"chess", name:"Chess", category:"Board", popular:true, path:"games/chess/index.html", note:"Local · vs computer", icon:"♟️", color:"#facc15" },
+  { id:"checkers", name:"Checkers", category:"Board", path:"games/checkers/index.html", note:"Local · vs computer", icon:"⚫", color:"#ef4444" },
+  { id:"connect-four", name:"Connect Four", category:"Board", path:"games/connect-four/index.html", note:"Local · 2 players", icon:"🟡", color:"#3b82f6" },
+  { id:"battleship", name:"Battleship", category:"Board", popular:true, path:"games/battleship/index.html", note:"Local · vs computer", icon:"🚢", color:"#7dd3fc" },
 ];
