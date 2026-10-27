@@ -1,4 +1,4 @@
-<img src="icon.svg" width="72" alt="Afterschool gamepad icon">
+<img src="icon.svg" width="72" alt="Afterschool logo">
 
 # Afterschool
 
@@ -31,6 +31,16 @@ It is designed to run locally: open the page, choose a game, or use the in-page 
 - **Connect Four** — Board · 2 players (see Credits)
 - **Battleship** — Board · vs computer (see Credits)
 - **Footballers** — Sports · original 8-bit football (see Credits)
+- **Snake** from patorjk/JavaScript-Snake — MIT License (`games/snake/LICENSE`)
+- **Pong** from jakesgordon/javascript-pong — MIT License (`games/pong/LICENSE`)
+- **Tetris** from jakesgordon/javascript-tetris — MIT License (`games/tetris/LICENSE`)
+- **Breakout** from jakesgordon/javascript-breakout — MIT License (`games/breakout/LICENSE`)
+- **Flappy Bird** from omariosouto/flappy-bird-devsoutinho — MIT License (`games/flappy-bird/LICENSE.md`)
+- **Minesweeper** from muan/emoji-minesweeper — MIT License (`games/minesweeper/LICENSE`)
+- **Memory Match** (Emojimori) from wsmd/emojimori — MIT License (`games/memory-match/LICENSE`)
+- **Simon** from sergiss/simon — MIT License (`games/simon/LICENSE`)
+- **Tic-Tac-Toe** from Mostafa-Samir/Tic-Tac-Toe-AI — MIT License (`games/tic-tac-toe/LICENSE`)
+- **Asteroids** (Stroids) from sclausen/stroids — BSD 3-Clause License (`games/asteroids/LICENSE.md`)
 
 ## Credits
 
@@ -45,7 +55,7 @@ Some games are adapted from open-source projects on GitHub, with their licenses 
 - **Battleship** (Battleboat) from billmei/battleboat — MIT License (`games/battleship/LICENSE.txt`)
 - **Footballers** (8-Bit Gridiron) by Demetrius Baker & family — MIT License (`games/footballers/LICENSE`); original art and sound (see `games/footballers/ASSET_LICENSES.md`)
 
-The remaining games were written for this repo.
+Every game in the portal is adapted from an open-source project on GitHub.
 
 ## Add a Game
 

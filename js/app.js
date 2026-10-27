@@ -130,7 +130,9 @@ function applyStyle() {
   const s = loadStyle();
   if (s.accent) document.documentElement.style.setProperty("--accent", s.accent);
   if (s.name) {
-    document.querySelector(".logo").textContent = s.name;
+    const logoEl = document.querySelector(".logo");
+    if (s.name !== "afterschool") logoEl.textContent = s.name;
+    else if (!logoEl.querySelector("img")) logoEl.innerHTML = '<img src="logo-white.svg" alt="Afterschool" class="logo-img" />';
     document.getElementById("wordmark").textContent = s.name;
     const c = loadCloak();
     if (c.preset === "none" && !c.customTitle) {
