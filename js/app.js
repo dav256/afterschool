@@ -1,18 +1,21 @@
 // Afterschool portal — renders the game library from js/games.js (DEFAULT_GAMES),
-// with per-device overrides (order, removals, additions, style, favorites, cloak)
-// kept in localStorage.
+// with per-device overrides (order, removals, additions, style, favorites,
+// recents, cloak) kept in localStorage.
 
 const LS_GAMES = "afterschool:games";
 const LS_STYLE = "afterschool:style";
 const LS_CLOAK = "afterschool:cloak";
 const LS_FAVS = "afterschool:favs";
 const LS_PLAYS = "afterschool:plays";
+const LS_RECENTS = "afterschool:recents";
 const ADMIN_PASSWORD = "afterschool"; // default shown in the admin dialog
 
 let games = loadGames();
 let favs = loadJSON(LS_FAVS, []);
 let plays = loadJSON(LS_PLAYS, {});
-let currentFilter = "all";
+let recents = loadJSON(LS_RECENTS, []);
+let segMode = "browse"; // browse | recents | favorites
+let chip = "all";       // all | popular | <category>
 let query = "";
 
 /* ---------- storage helpers ---------- */
@@ -38,6 +41,13 @@ function loadGames() {
   return DEFAULT_GAMES.slice();
 }
 function saveGames() { saveJSON(LS_GAMES, games); }
+
+function recordPlay(g) {
+  plays[g.id] = (plays[g.id] || 0) + 1;
+  saveJSON(LS_PLAYS, plays);
+  recents = [g.id].concat(recents.filter((id) => id !== g.id)).slice(0, 30);
+  saveJSON(LS_RECENTS, recents);
+}
 
 /* ---------- cloak ---------- */
 
@@ -121,6 +131,7 @@ function applyStyle() {
   if (s.accent) document.documentElement.style.setProperty("--accent", s.accent);
   if (s.name) {
     document.querySelector(".logo").textContent = s.name;
+    document.getElementById("wordmark").textContent = s.name;
     const c = loadCloak();
     if (c.preset === "none" && !c.customTitle) {
       document.title = s.name.charAt(0).toUpperCase() + s.name.slice(1);
@@ -138,7 +149,7 @@ function applyStyle() {
   });
 }
 
-/* ---------- rendering ---------- */
+/* ---------- browsing: segments + chips ---------- */
 
 function esc(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
@@ -147,12 +158,48 @@ function esc(s) {
 }
 
 function visibleGames() {
-  return games.filter((g) => {
-    if (currentFilter === "popular" && !g.popular) return false;
-    if (currentFilter === "favorites" && !favs.includes(g.id)) return false;
-    if (currentFilter !== "all" && currentFilter !== "popular" && currentFilter !== "favorites" && g.category !== currentFilter) return false;
-    if (query && !g.name.toLowerCase().includes(query)) return false;
-    return true;
+  let list;
+  if (segMode === "recents") {
+    const byId = new Map(games.map((g) => [g.id, g]));
+    list = recents.map((id) => byId.get(id)).filter(Boolean);
+  } else if (segMode === "favorites") {
+    list = games.filter((g) => favs.includes(g.id));
+  } else {
+    list = games.slice();
+    if (chip === "popular") list = list.filter((g) => g.popular);
+    else if (chip !== "all") list = list.filter((g) => g.category === chip);
+  }
+  if (query) list = list.filter((g) => g.name.toLowerCase().includes(query));
+  return list;
+}
+
+function renderChips() {
+  const el = document.getElementById("chips");
+  el.style.display = segMode === "browse" ? "" : "none";
+  if (segMode !== "browse") return;
+  const counts = {};
+  games.forEach((g) => { counts[g.category] = (counts[g.category] || 0) + 1; });
+  const cats = Object.keys(counts).sort((a, b) => counts[b] - counts[a] || a.localeCompare(b));
+  const popularCount = games.filter((g) => g.popular).length;
+  const defs = [{ id: "all", label: "All Games", n: games.length },
+                { id: "popular", label: "Popular", n: popularCount }]
+    .concat(cats.map((c) => ({ id: c, label: c, n: counts[c] })));
+  el.innerHTML = defs.map((d) =>
+    '<button class="chip' + (chip === d.id ? " active" : "") + '" data-chip="' + esc(d.id) + '">' +
+    esc(d.label) + '<span class="n">' + d.n + "</span></button>"
+  ).join("");
+}
+
+function syncNav() {
+  document.querySelectorAll(".seg-btn").forEach((b) => {
+    b.classList.toggle("active", b.getAttribute("data-seg") === segMode);
+  });
+  document.querySelectorAll("[data-filter]").forEach((el) => {
+    const f = el.getAttribute("data-filter");
+    let on = false;
+    if (segMode === "favorites") on = f === "favorites";
+    else if (segMode === "browse") on = f === chip;
+    el.classList.toggle("active", on);
   });
 }
 
@@ -161,9 +208,11 @@ function render() {
   document.getElementById("total-count").textContent = games.length;
   document.getElementById("showing-count").textContent =
     "Showing " + list.length + " of " + games.length + " games";
+  renderChips();
+  syncNav();
 
   const featuredEl = document.getElementById("featured");
-  if (currentFilter === "all" && !query) {
+  if (segMode === "browse" && chip === "all" && !query) {
     const picks = games.filter((g) => g.popular).slice(0, 2);
     featuredEl.innerHTML = picks.map((g) =>
       '<a class="featured-card" href="' + esc(g.path) + '">' +
@@ -181,40 +230,37 @@ function render() {
 
   const grid = document.getElementById("grid");
   if (!list.length) {
-    grid.innerHTML = '<div class="empty">' +
-      (currentFilter === "favorites"
-        ? "No favorites yet. Tap the star on any game to pin it here."
-        : "No games match. Try a different search or category.") +
-      "</div>";
+    let msg = "No games match. Try a different search or category.";
+    if (segMode === "favorites") msg = "No favorites yet. Hover a game and tap the heart to pin it here.";
+    if (segMode === "recents") msg = "Nothing here yet — games you play will show up here.";
+    grid.innerHTML = '<div class="empty">' + msg + "</div>";
     return;
   }
   grid.innerHTML = list.map((g) => {
     const isFav = favs.includes(g.id);
     return '<a class="card" href="' + esc(g.path) + '" data-id="' + esc(g.id) + '">' +
-      '<div class="card-thumb">' +
+      '<div class="thumb" style="background:' + esc(g.color || "#2a2a2a") + '">' +
         (g.popular ? '<span class="badge">Popular</span>' : "") +
-        '<span class="icon" style="background:' + esc(g.color || "#7dffa3") + '">' + esc(g.icon || "🎮") + "</span>" +
-        '<span class="fav' + (isFav ? " active" : "") + '" data-fav="' + esc(g.id) + '" title="Favorite">' + (isFav ? "★" : "☆") + "</span>" +
+        '<span class="icon">' + esc(g.icon || "🎮") + "</span>" +
+        '<span class="fav' + (isFav ? " active" : "") + '" data-fav="' + esc(g.id) + '" title="Favorite">♥</span>' +
+        '<span class="play"><i>▶</i></span>' +
       "</div>" +
-      '<div class="card-body"><h3>' + esc(g.name) + "</h3>" +
-      '<div class="card-meta">' + esc(g.category) + " · " + esc(g.note || "Local") + "</div></div>" +
+      '<div class="card-title">' + esc(g.name) + "</div>" +
+      '<div class="card-meta">' + esc(g.category) + " · " + esc(g.note || "Local") + "</div>" +
     "</a>";
   }).join("");
 }
 
 function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll("[data-filter]").forEach((el) => {
-    el.classList.toggle("active", el.getAttribute("data-filter") === f);
-  });
+  if (f === "favorites") { segMode = "favorites"; }
+  else { segMode = "browse"; chip = f; }
   render();
 }
 
 function playRandom() {
   if (!games.length) return;
   const g = games[Math.floor(Math.random() * games.length)];
-  plays[g.id] = (plays[g.id] || 0) + 1;
-  saveJSON(LS_PLAYS, plays);
+  recordPlay(g);
   window.location.href = g.path;
 }
 
@@ -295,13 +341,13 @@ function showTab(name) {
   if (name === "cloak") renderCloakTab();
 }
 
+let pendingTab = null;
 function openAdmin(tab) {
   document.getElementById("admin-modal").hidden = false;
   const panel = document.getElementById("admin-panel");
-  if (!panel.hidden && tab) showTab(tab);
-  else if (tab) pendingTab = tab;
+  if (!panel.hidden) showTab(tab || "games");
+  else pendingTab = tab || "games";
 }
-let pendingTab = null;
 
 /* ---------- init ---------- */
 
@@ -315,6 +361,13 @@ function init() {
   document.querySelectorAll("[data-filter]").forEach((el) => {
     el.addEventListener("click", () => setFilter(el.getAttribute("data-filter")));
   });
+  document.querySelectorAll(".seg-btn").forEach((b) => {
+    b.addEventListener("click", () => { segMode = b.getAttribute("data-seg"); render(); });
+  });
+  document.getElementById("chips").addEventListener("click", (e) => {
+    const c = e.target.closest("[data-chip]");
+    if (c) { chip = c.getAttribute("data-chip"); render(); }
+  });
   document.getElementById("btn-random").addEventListener("click", playRandom);
   document.getElementById("btn-hero-random").addEventListener("click", playRandom);
   document.getElementById("search").addEventListener("input", (e) => {
@@ -322,7 +375,7 @@ function init() {
     render();
   });
 
-  // favorites + play counts (event delegation on the grid)
+  // favorites + play tracking (event delegation)
   document.getElementById("grid").addEventListener("click", (e) => {
     const favEl = e.target.closest("[data-fav]");
     if (favEl) {
@@ -337,14 +390,14 @@ function init() {
     const card = e.target.closest("a.card");
     if (card) {
       const g = games.find((x) => x.id === card.getAttribute("data-id"));
-      if (g) { plays[g.id] = (plays[g.id] || 0) + 1; saveJSON(LS_PLAYS, plays); }
+      if (g) recordPlay(g);
     }
   });
   document.getElementById("featured").addEventListener("click", (e) => {
     const card = e.target.closest("a.featured-card");
     if (card) {
       const g = games.find((x) => x.path === card.getAttribute("href"));
-      if (g) { plays[g.id] = (plays[g.id] || 0) + 1; saveJSON(LS_PLAYS, plays); }
+      if (g) recordPlay(g);
     }
   });
 
@@ -396,7 +449,7 @@ function init() {
       path: path,
       note: "Local",
       icon: "🎮",
-      color: "#7dffa3",
+      color: "#2a2a2a",
     });
     saveGames();
     document.getElementById("add-name").value = "";
@@ -434,6 +487,7 @@ function init() {
       cloak: loadCloak(),
       favs: favs,
       plays: plays,
+      recents: recents,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
@@ -455,13 +509,14 @@ function init() {
         if (data.cloak) saveJSON(LS_CLOAK, data.cloak);
         if (data.favs) saveJSON(LS_FAVS, data.favs);
         if (data.plays) saveJSON(LS_PLAYS, data.plays);
+        if (data.recents) saveJSON(LS_RECENTS, data.recents);
         location.reload();
       } catch (e) { alert("That file could not be imported."); }
     });
   });
   document.getElementById("data-reset").addEventListener("click", () => {
-    if (!confirm("Reset games, style, cloak, favorites, and play counts on this device?")) return;
-    [LS_GAMES, LS_STYLE, LS_CLOAK, LS_FAVS, LS_PLAYS].forEach((k) => localStorage.removeItem(k));
+    if (!confirm("Reset games, style, cloak, favorites, recents, and play counts on this device?")) return;
+    [LS_GAMES, LS_STYLE, LS_CLOAK, LS_FAVS, LS_PLAYS, LS_RECENTS].forEach((k) => localStorage.removeItem(k));
     location.reload();
   });
 
