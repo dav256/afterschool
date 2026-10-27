@@ -1,185 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> 
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pong — Afterschool</title>
-<style>
-  *{box-sizing:border-box}
-  body{margin:0;background:#0d100e;color:#e8f0e9;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:18px 12px}
-  .panel{background:#151a16;border:1px solid #232b24;border-radius:16px;padding:16px;width:100%;max-width:900px}
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-  .topbar h1{font-size:1.05rem;margin:0;font-weight:700}
-  a.back{color:#7dffa3;text-decoration:none;font-size:.95rem;white-space:nowrap}
-  button{background:#7dffa3;color:#0d100e;border:0;border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:.9rem}
-  button:hover{filter:brightness(1.08)}
-  .score{font-size:1.05rem;margin:2px 0 10px;text-align:center}
-  .score b{color:#7dffa3}
-  .hint{color:#93a396;font-size:.85rem;margin-top:10px;text-align:center}
-  .stage{position:relative}
-  canvas{display:block;width:100%;height:auto;background:#0a0f0c;border:1px solid #232b24;border-radius:12px;touch-action:none}
-  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(6,10,7,.72);border-radius:12px;text-align:center;padding:16px}
-  .overlay.show{display:flex}
-  .overlay h2{margin:0;font-size:1.6rem}
-  .overlay p{margin:0;color:#93a396}
-</style>
-</head>
+  <title>Pong!</title> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
+  <link href="pong.css" media="screen, print" rel="stylesheet" type="text/css" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head> 
+ 
 <body>
-<div class="panel">
-  <div class="topbar">
-    <a class="back" href="../../index.html">&larr; Afterschool</a>
-    <h1>Pong</h1>
-    <button id="restartBtn" type="button">Restart</button>
-  </div>
-  <div class="score" id="score">You <b>0</b> &mdash; <b>0</b> CPU &middot; First to 7</div>
-  <div class="stage">
-    <canvas id="c" width="860" height="520"></canvas>
-    <div class="overlay show" id="ov">
-      <h2 id="ovTitle">Pong</h2>
-      <p id="ovText">Beat the computer. First to 7 wins.</p>
-      <button id="ovBtn" type="button">Start</button>
+<a href="../../index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#141414;color:#f5f5f5;border:1px solid #333;padding:6px 12px;border-radius:999px;font-family:system-ui,sans-serif;font-size:13px;text-decoration:none">&#8592; Afterschool</a>
+<a href="../../index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#151a16;color:#7dffa3;border:1px solid #2a3a30;padding:6px 12px;border-radius:999px;font-family:system-ui,sans-serif;font-size:13px;text-decoration:none">&#8592; Afterschool</a> 
+
+  <div id="sidebar">
+
+    <h2>This is Pong!</h2>
+
+    <ul class='parts'>
+      <li><a href='/' class='selected'>Full Game</a></li>
+    </ul>
+
+    <div class='description'>
+      <p>
+        This is a javascript version of Pong.
+      </p>
+      <p>
+        Press <b>1</b> for a single player game.<br>
+        Press <b>2</b> for a double player game.<br>
+        Press <b>0</b> to watch the computer play itself.
+      </p>
+      <p>
+        Player 1 moves using the <b>Q</b> and <b>A</b> keys.<br>
+        Player 2 moves using the <b>P</b> and <b>L</b> keys.
+      </p>
+      <p>
+        <b>Esc</b> can be used to abandon a game.
+      </p>
     </div>
+
+    <div class='settings'>
+      <label for='sound'>sound: </label>
+      <input type='checkbox' id='sound'>
+    </div>
+
+    <div class='settings'>
+      <label for='stats'>stats: </label>
+      <input type='checkbox' id='stats' checked>
+    </div>
+
+    <div class='settings'>
+      <label for='footprints'>footprints: </label>
+      <input type='checkbox' id='footprints'>
+    </div>
+
+    <div class='settings'>
+      <label for='predictions'>predictions: </label>
+      <input type='checkbox' id='predictions'>
+    </div>
+
   </div>
-  <div class="hint">Controls: Mouse / Touch to move &middot; &uarr; &darr; or W / S keys</div>
-</div>
-<script>
-(function(){
-  var cv=document.getElementById('c'),ctx=cv.getContext('2d');
-  var W=cv.width,H=cv.height,WIN=7;
-  var scoreEl=document.getElementById('score');
-  var ov=document.getElementById('ov'),ovTitle=document.getElementById('ovTitle'),
-      ovText=document.getElementById('ovText'),ovBtn=document.getElementById('ovBtn');
-  var PW=12,PH=92;
-  var player,ai,ball,pScore,aScore,state,serveTimer,keys={};
-  var mouseY=null;
-  function reset(){
-    player={x:16,y:H/2-PH/2,w:PW,h:PH};
-    ai={x:W-16-PW,y:H/2-PH/2,w:PW,h:PH};
-    pScore=0;aScore=0;state='ready';mouseY=null;
-    serve(Math.random()<0.5?-1:1);
-    showOv('Pong','Beat the computer. First to 7 wins.','Start');
-    renderScore();draw();
-  }
-  function renderScore(){
-    scoreEl.innerHTML='You <b>'+pScore+'</b> &mdash; <b>'+aScore+'</b> CPU &middot; First to '+WIN;
-  }
-  function showOv(t,s,b){ovTitle.textContent=t;ovText.textContent=s;ovBtn.textContent=b;ov.classList.add('show');}
-  function hideOv(){ov.classList.remove('show');}
-  function start(){reset();state='play';hideOv();}
-  function serve(dir){
-    var ang=(Math.random()*0.6-0.3);
-    var sp=6;
-    ball={x:W/2,y:H/2,r:9,vx:dir*sp*Math.cos(ang),vy:sp*Math.sin(ang),speed:sp};
-    serveTimer=45;
-  }
-  function gameOver(){
-    state='over';
-    showOv(pScore>WIN-1?'You Win!':'CPU Wins',
-      'Final score: You '+pScore+' — '+aScore+' CPU.','Play Again');
-  }
-  function point(who){
-    if(who==='player'){pScore++;}else{aScore++;}
-    renderScore();
-    if(pScore>=WIN||aScore>=WIN){gameOver();return;}
-    // serve toward the player who just lost the point
-    serve(who==='player'?1:-1);
-  }
-  function step(dt){
-    if(state!=='play'){draw();return;}
-    // player: keys
-    var ps=7*dt;
-    if(keys.up)player.y-=ps;
-    if(keys.down)player.y+=ps;
-    // player: mouse/touch target
-    if(mouseY!==null){
-      var target=mouseY-player.h/2;
-      player.y+=(target-player.y)*Math.min(1,0.55*dt+0.2);
-    }
-    player.y=Math.max(0,Math.min(H-player.h,player.y));
-    // AI: track the ball with a capped speed
-    var center=ai.y+ai.h/2,dy=ball.y-center,maxA=5.3*dt;
-    if(Math.abs(dy)>6){
-      ai.y+=Math.max(-maxA,Math.min(maxA,dy));
-    }
-    ai.y=Math.max(0,Math.min(H-ai.h,ai.y));
-    // serve pause
-    if(serveTimer>0){serveTimer-=dt;draw();return;}
-    // ball
-    ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;
-    if(ball.y-ball.r<0){ball.y=ball.r;ball.vy=Math.abs(ball.vy);}
-    if(ball.y+ball.r>H){ball.y=H-ball.r;ball.vy=-Math.abs(ball.vy);}
-    // player paddle
-    if(ball.vx<0&&ball.x-ball.r<=player.x+player.w&&ball.x-ball.r>=player.x-6&&
-       ball.y>player.y-4&&ball.y<player.y+player.h+4){
-      bounce(player,1);
-    }
-    // ai paddle
-    if(ball.vx>0&&ball.x+ball.r>=ai.x&&ball.x+ball.r<=ai.x+ai.w+6&&
-       ball.y>ai.y-4&&ball.y<ai.y+ai.h+4){
-      bounce(ai,-1);
-    }
-    if(ball.x<-24)point('ai');
-    else if(ball.x>W+24)point('player');
-    draw();
-  }
-  function bounce(p,dir){
-    var rel=(ball.y-(p.y+p.h/2))/(p.h/2);
-    rel=Math.max(-1,Math.min(1,rel));
-    var ang=rel*1.05;
-    ball.speed=Math.min(12.5,ball.speed+0.45);
-    ball.vx=dir*ball.speed*Math.cos(ang);
-    ball.vy=ball.speed*Math.sin(ang);
-    ball.x=dir>0?p.x+p.w+ball.r+1:p.x-ball.r-1;
-  }
-  function rr(x,y,w,h,r){
-    ctx.beginPath();
-    ctx.moveTo(x+r,y);
-    ctx.arcTo(x+w,y,x+w,y+h,r);
-    ctx.arcTo(x+w,y+h,x,y+h,r);
-    ctx.arcTo(x,y+h,x,y,r);
-    ctx.arcTo(x,y,x+w,y,r);
-    ctx.closePath();
-  }
-  function draw(){
-    ctx.fillStyle='#0a0f0c';ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle='#263328';ctx.lineWidth=3;ctx.setLineDash([10,14]);
-    ctx.beginPath();ctx.moveTo(W/2,8);ctx.lineTo(W/2,H-8);ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='#7dffa3';rr(player.x,player.y,player.w,player.h,6);ctx.fill();
-    ctx.fillStyle='#e8f0e9';rr(ai.x,ai.y,ai.w,ai.h,6);ctx.fill();
-    ctx.fillStyle='#e8f0e9';
-    ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();
-    if(state==='play'&&serveTimer>0){
-      ctx.fillStyle='#93a396';ctx.font='600 15px system-ui,sans-serif';ctx.textAlign='center';
-      ctx.fillText('Serving…',W/2,H-16);
-    }
-  }
-  var last=0;
-  function loop(t){
-    var dt=last?Math.min(2.5,(t-last)/16.667):1;
-    last=t;step(dt);
-    requestAnimationFrame(loop);
-  }
-  document.addEventListener('keydown',function(e){
-    if(e.code==='ArrowUp'||e.code==='KeyW'){e.preventDefault();keys.up=true;}
-    else if(e.code==='ArrowDown'||e.code==='KeyS'){e.preventDefault();keys.down=true;}
-    else if(e.code==='Space'){e.preventDefault();}
+
+  <canvas id="game">
+    <div id="unsupported">
+      Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
+    </div>
+  </canvas>
+
+  <script src="game.js" type="text/javascript"></script> 
+  <script src="pong.js" type="text/javascript"></script>
+  <script type="text/javascript">
+  Game.ready(function() {
+
+    var size        = document.getElementById('size');
+    var sound       = document.getElementById('sound');
+    var stats       = document.getElementById('stats');
+    var footprints  = document.getElementById('footprints');
+    var predictions = document.getElementById('predictions');
+
+    var pong = Game.start('game', Pong, {
+      sound:       sound.checked,
+      stats:       stats.checked,
+      footprints:  footprints.checked,
+      predictions: predictions.checked
+    });
+
+    Game.addEvent(sound,       'change', function() { pong.enableSound(sound.checked);           });
+    Game.addEvent(stats,       'change', function() { pong.showStats(stats.checked);             });
+    Game.addEvent(footprints,  'change', function() { pong.showFootprints(footprints.checked);   });
+    Game.addEvent(predictions, 'change', function() { pong.showPredictions(predictions.checked); });
+
   });
-  document.addEventListener('keyup',function(e){
-    if(e.code==='ArrowUp'||e.code==='KeyW')keys.up=false;
-    else if(e.code==='ArrowDown'||e.code==='KeyS')keys.down=false;
-  });
-  function pointerY(e){
-    var r=cv.getBoundingClientRect();
-    return (e.clientY-r.top)*(H/r.height);
-  }
-  cv.addEventListener('pointermove',function(e){mouseY=pointerY(e);});
-  cv.addEventListener('pointerdown',function(e){e.preventDefault();mouseY=pointerY(e);});
-  ovBtn.addEventListener('click',start);
-  document.getElementById('restartBtn').addEventListener('click',reset);
-  reset();
-  requestAnimationFrame(loop);
-})();
-</script>
-</body>
+  </script>
+
+</body> 
 </html>

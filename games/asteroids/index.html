@@ -1,269 +1,405 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asteroids — Afterschool</title>
-<style>
-  *{box-sizing:border-box}
-  body{margin:0;background:#0d100e;color:#e8f0e9;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:18px 12px}
-  .panel{background:#151a16;border:1px solid #232b24;border-radius:16px;padding:16px;width:100%;max-width:900px}
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-  .topbar h1{font-size:1.05rem;margin:0;font-weight:700}
-  a.back{color:#7dffa3;text-decoration:none;font-size:.95rem;white-space:nowrap}
-  button{background:#7dffa3;color:#0d100e;border:0;border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:.9rem}
-  button:hover{filter:brightness(1.08)}
-  .score{font-size:1rem;margin:2px 0 10px}
-  .score b{color:#7dffa3}
-  .hint{color:#93a396;font-size:.85rem;margin-top:10px;text-align:center}
-  .stage{position:relative}
-  canvas{display:block;width:100%;height:auto;background:#070907;border:1px solid #232b24;border-radius:12px;touch-action:none}
-  .overlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(6,10,7,.72);border-radius:12px;text-align:center;padding:16px}
-  .overlay.show{display:flex}
-  .overlay h2{margin:0;font-size:1.6rem}
-  .overlay p{margin:0;color:#93a396}
-  .touchrow{display:none;gap:10px;margin-top:12px;justify-content:center}
-  @media(pointer:coarse){.touchrow{display:flex}}
-  .touchrow button{flex:1;padding:12px}
-</style>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>asteroids</title>
+        <style>
+            #canvas
+            {
+                background-color: black;
+            }
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0px;
+            }
+        </style>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body>
-<div class="panel">
-  <div class="topbar">
-    <a class="back" href="../../index.html">&larr; Afterschool</a>
-    <h1>Asteroids</h1>
-    <button id="restartBtn" type="button">Restart</button>
-  </div>
-  <div class="score" id="score">Score: <b>0</b> &middot; Lives: <b>3</b> &middot; Wave: <b>1</b></div>
-  <div class="stage">
-    <canvas id="c" width="860" height="600"></canvas>
-    <div class="overlay show" id="ov">
-      <h2 id="ovTitle">Asteroids</h2>
-      <p id="ovText">Blast the rocks. Big ones split in two — don't get hit!</p>
-      <button id="ovBtn" type="button">Start</button>
-    </div>
-  </div>
-  <div class="touchrow">
-    <button data-k="left" type="button">&larr; Turn</button>
-    <button data-k="thrust" type="button">&uarr; Thrust</button>
-    <button data-k="right" type="button">Turn &rarr;</button>
-    <button data-k="fire" type="button">Fire</button>
-  </div>
-  <div class="hint">Controls: &larr; &rarr; rotate &middot; &uarr; thrust &middot; Space to fire &middot; Tap Fire on touch screens</div>
-</div>
-<script>
-(function(){
-  var cv=document.getElementById('c'),ctx=cv.getContext('2d');
-  var W=cv.width,H=cv.height;
-  var scoreEl=document.getElementById('score');
-  var ov=document.getElementById('ov'),ovTitle=document.getElementById('ovTitle'),
-      ovText=document.getElementById('ovText'),ovBtn=document.getElementById('ovBtn');
-  var best=parseInt(localStorage.getItem('astBest')||'0',10)||0;
-  var ship,bullets,rocks,score,lives,wave,state,cool,invuln,stars;
-  var keys={left:false,right:false,thrust:false,fire:false};
-  function reset(){
-    score=0;lives=3;wave=1;bullets=[];rocks=[];
-    stars=[];
-    for(var i=0;i<70;i++)stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.3});
-    resetShip();
-    spawnWave();
-    state='ready';
-    showOv('Asteroids','Blast the rocks. Big ones split in two — don\'t get hit!','Start');
-    renderScore();draw();
-  }
-  function resetShip(){
-    ship={x:W/2,y:H/2,vx:0,vy:0,a:-Math.PI/2,r:11};
-    invuln=150;cool=0;
-  }
-  function renderScore(){
-    scoreEl.innerHTML='Score: <b>'+score+'</b> &middot; Lives: <b>'+lives+'</b> &middot; Wave: <b>'+wave+'</b> &middot; Best: <b>'+best+'</b>';
-  }
-  function showOv(t,s,b){ovTitle.textContent=t;ovText.textContent=s;ovBtn.textContent=b;ov.classList.add('show');}
-  function hideOv(){ov.classList.remove('show');}
-  function start(){reset();state='play';hideOv();}
-  function gameOver(){
-    state='over';
-    if(score>best){best=score;localStorage.setItem('astBest',String(best));}
-    renderScore();
-    showOv('Game Over','You scored '+score+'. Best: '+best+'.','Play Again');
-  }
-  function makeRock(x,y,r){
-    var verts=[],n=10;
-    for(var i=0;i<n;i++){
-      verts.push({a:(i/n)*Math.PI*2,d:r*(0.74+Math.random()*0.42)});
-    }
-    var sp=r>30?0.7+Math.random()*0.7:1+Math.random()*1.1;
-    var dir=Math.random()*Math.PI*2;
-    return {x:x,y:y,vx:Math.cos(dir)*sp,vy:Math.sin(dir)*sp,r:r,verts:verts,
-            rot:Math.random()*Math.PI*2,vr:(Math.random()-0.5)*0.02};
-  }
-  function spawnWave(){
-    var n=3+wave;
-    for(var i=0;i<n;i++){
-      var x,y,tries=0;
-      do{x=Math.random()*W;y=Math.random()*H;tries++;}
-      while(Math.hypot(x-ship.x,y-ship.y)<170&&tries<20);
-      rocks.push(makeRock(x,y,46));
-    }
-  }
-  function wrap(o){
-    if(o.x<-55)o.x+=W+110;if(o.x>W+55)o.x-=W+110;
-    if(o.y<-55)o.y+=H+110;if(o.y>H+55)o.y-=H+110;
-  }
-  function fire(){
-    var nx=ship.x+Math.cos(ship.a)*16,ny=ship.y+Math.sin(ship.a)*16;
-    bullets.push({x:nx,y:ny,vx:Math.cos(ship.a)*9+ship.vx*0.4,vy:Math.sin(ship.a)*9+ship.vy*0.4,life:52});
-    cool=9;
-  }
-  function step(dt){
-    if(state!=='play'){draw();return;}
-    // ship
-    if(keys.left)ship.a-=0.085*dt;
-    if(keys.right)ship.a+=0.085*dt;
-    if(keys.thrust){
-      ship.vx+=Math.cos(ship.a)*0.17*dt;
-      ship.vy+=Math.sin(ship.a)*0.17*dt;
-    }
-    var fr=Math.pow(0.99,dt);
-    ship.vx*=fr;ship.vy*=fr;
-    var spd=Math.hypot(ship.vx,ship.vy);
-    if(spd>7){ship.vx=ship.vx/spd*7;ship.vy=ship.vy/spd*7;}
-    ship.x+=ship.vx*dt;ship.y+=ship.vy*dt;
-    wrap(ship);
-    if(invuln>0)invuln-=dt;
-    // firing
-    if(cool>0)cool-=dt;
-    if(keys.fire&&cool<=0)fire();
-    // bullets
-    for(var i=bullets.length-1;i>=0;i--){
-      var b=bullets[i];
-      b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;
-      if(b.life<=0||b.x<0||b.x>W||b.y<0||b.y>H){bullets.splice(i,1);}
-    }
-    // rocks
-    for(var j=0;j<rocks.length;j++){
-      var r=rocks[j];
-      r.x+=r.vx*dt;r.y+=r.vy*dt;r.rot+=r.vr*dt;
-      wrap(r);
-    }
-    // bullet vs rock
-    for(var bi=bullets.length-1;bi>=0;bi--){
-      var hit=false;
-      for(var ri=rocks.length-1;ri>=0;ri--){
-        var rk=rocks[ri];
-        if(Math.hypot(bullets[bi].x-rk.x,bullets[bi].y-rk.y)<rk.r+3){
-          hit=true;
-          score+=rk.r>30?20:(rk.r>18?50:100);
-          if(rk.r>15){
-            rocks.push(makeRock(rk.x,rk.y,rk.r>30?26:14));
-            rocks.push(makeRock(rk.x,rk.y,rk.r>30?26:14));
-          }
-          rocks.splice(ri,1);
-          renderScore();
-          break;
-        }
-      }
-      if(hit)bullets.splice(bi,1);
-    }
-    // ship vs rock
-    if(invuln<=0){
-      for(var k=0;k<rocks.length;k++){
-        var q=rocks[k];
-        if(Math.hypot(ship.x-q.x,ship.y-q.y)<q.r*0.85+ship.r){
-          lives--;renderScore();
-          if(lives<=0){gameOver();draw();return;}
-          resetShip();
-          break;
-        }
-      }
-    }
-    // wave clear
-    if(rocks.length===0){
-      wave++;renderScore();
-      resetShip();
-      spawnWave();
-    }
-    draw();
-  }
-  function draw(){
-    ctx.fillStyle='#070907';ctx.fillRect(0,0,W,H);
-    ctx.fillStyle='#3d4a3f';
-    for(var i=0;i<stars.length;i++){ctx.fillRect(stars[i].x,stars[i].y,stars[i].r,stars[i].r);}
-    // rocks
-    ctx.strokeStyle='#cfe6d2';ctx.lineWidth=2;
-    for(var j=0;j<rocks.length;j++){
-      var r=rocks[j];
-      ctx.beginPath();
-      for(var v=0;v<r.verts.length;v++){
-        var p=r.verts[v],px=r.x+Math.cos(p.a+r.rot)*p.d,py=r.y+Math.sin(p.a+r.rot)*p.d;
-        if(v===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
-      }
-      ctx.closePath();ctx.stroke();
-    }
-    // bullets
-    ctx.fillStyle='#7dffa3';
-    for(var b=0;b<bullets.length;b++){
-      ctx.beginPath();ctx.arc(bullets[b].x,bullets[b].y,3,0,Math.PI*2);ctx.fill();
-    }
-    // ship (blink while invulnerable)
-    if(!(invuln>0&&Math.floor(invuln/8)%2===0)){
-      ctx.save();
-      ctx.translate(ship.x,ship.y);ctx.rotate(ship.a);
-      if(keys.thrust&&state==='play'){
-        ctx.fillStyle='#ff9d45';
-        ctx.beginPath();
-        ctx.moveTo(-10,5);ctx.lineTo(-19,0);ctx.lineTo(-10,-5);ctx.closePath();ctx.fill();
-      }
-      ctx.strokeStyle='#7dffa3';ctx.lineWidth=2;
-      ctx.beginPath();
-      ctx.moveTo(16,0);ctx.lineTo(-11,10);ctx.lineTo(-6,0);ctx.lineTo(-11,-10);
-      ctx.closePath();ctx.stroke();
-      ctx.restore();
-    }
-  }
-  var last=0;
-  function loop(t){
-    var dt=last?Math.min(2.5,(t-last)/16.667):1;
-    last=t;step(dt);
-    requestAnimationFrame(loop);
-  }
-  document.addEventListener('keydown',function(e){
-    if(e.code==='ArrowLeft'){e.preventDefault();keys.left=true;}
-    else if(e.code==='ArrowRight'){e.preventDefault();keys.right=true;}
-    else if(e.code==='ArrowUp'){e.preventDefault();keys.thrust=true;}
-    else if(e.code==='Space'){e.preventDefault();keys.fire=true;}
-  });
-  document.addEventListener('keyup',function(e){
-    if(e.code==='ArrowLeft')keys.left=false;
-    else if(e.code==='ArrowRight')keys.right=false;
-    else if(e.code==='ArrowUp')keys.thrust=false;
-    else if(e.code==='Space')keys.fire=false;
-  });
-  cv.addEventListener('pointerdown',function(e){
-    e.preventDefault();
-    if(state==='ready'){state='play';hideOv();}
-    keys.fire=true;
-  });
-  cv.addEventListener('pointerup',function(){keys.fire=false;});
-  cv.addEventListener('pointerleave',function(){keys.fire=false;});
-  var tbtns=document.querySelectorAll('.touchrow button');
-  for(var i=0;i<tbtns.length;i++){
-    (function(btn){
-      var k=btn.getAttribute('data-k');
-      btn.addEventListener('pointerdown',function(e){
-        e.preventDefault();
-        if(state==='ready'){state='play';hideOv();}
-        keys[k]=true;
-      });
-      btn.addEventListener('pointerup',function(){keys[k]=false;});
-      btn.addEventListener('pointerleave',function(){keys[k]=false;});
-    })(tbtns[i]);
-  }
-  ovBtn.addEventListener('click',start);
-  document.getElementById('restartBtn').addEventListener('click',reset);
-  reset();
-  requestAnimationFrame(loop);
-})();
-</script>
-</body>
+    <body>
+<a href="../../index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#141414;color:#f5f5f5;border:1px solid #333;padding:6px 12px;border-radius:999px;font-family:system-ui,sans-serif;font-size:13px;text-decoration:none">&#8592; Afterschool</a>
+        <canvas id="canvas" width="600" height="600">
+            Dein Browser kann diese Grafik nicht darstellen.
+        </canvas>
+        <script type="text/javascript" src="vector.js"></script>
+        <script type="text/javascript">
+            var WIDTH;
+            var HEIGHT;
+            var ctx;
+            var canvas;
+            var mouse_x = 300, mouse_y = 300;
+            var mouseState = false;
+            var keyState = new Array();
+            
+            var polygons;
+            var asteroids = new Array();
+            var player;
+            var asteroid_forms = new Array();
+            var asteroid1 = new Array();
+            var asteroid2 = new Array();
+            var asteroid3 = new Array();
+            var asteroidCount = 5;
+            var ufo = new Array();
+            //polygons[0] = new Array($V(0,0),$V(0,100),$V(100,100),$V(100,0),$V(0,0));
+            polygons  = [[6,0,0,3,0,5,6,6,0,9,3,13,6,11,12,13,16,8,16,3,10,3,12,0,6,0]];
+            asteroid1 = [[6,0,0,3,0,5,6,6,0,9,3,13,6,11,12,13,16,8,16,3,10,3,12,0,6,0]]; // canvas-coordinates
+            asteroid2 = [[4,0,0,4,5,6,1,9,4,15,10,12,12,15,17,11,14,7,17,5,12,0,9,3,4,0]]; // canvas-coordinates
+            asteroid3 = [[4,0,0,4,2,7,0,10,6,14,11,14,16,11,16,4,12,0,8,4,4,0]];
+            
+            asteroid_forms = [asteroid1,asteroid2,asteroid3];
+            
+            //ufo[0] = new Array($V(3,0),$V(0,2),$V(3,4),$V(9,4),$V(12,2),$V(9,0),$V(3,0));
+            //ufo[1] = new Array($V(0,2),$V(12,2));
+            //ufo[2] = new Array($V(4,4),$V(5,6),$V(7,6),$V(8,4));
+            ufo = [
+                    [3,2,0,4,3,6,9,6,12,4,9,3,3,2],
+                    [0,4,12,4],
+                    [4,2,5,0,7,0,8,2]
+                ];
+            ship = [
+                    [0,0,15,5,0,10],
+                    [3,1,3,9]
+                ];
+            //ship = [
+            //        [10,15,5,0,0,15],
+            //        [1,12,9,12]
+            //    ];
+
+            //function particle(x,y,vx,vy)
+            //{
+            //    return {
+            //        position: $V(x,y),
+            //        acceleration: $V(vx,vy),
+            //        draw: function()
+            //        {
+            //            circle(this.position.x,this.position.y,1,'#FFF');
+            //        }
+            //    };
+            //}
+            
+            
+            function get_polygon_center(points)
+            { 
+                var center = [0,0];
+                for(var i = 0; i < points.length; i+=2)
+                {
+                    center[0] += points[i];
+                    center[1] += points[i+1];
+                }
+                center[0] /= (points.length/2);
+                center[1] /= (points.length/2);
+                return center;
+            }
+            
+            function asteroid(x,y,elements,size,velocity,center)
+            {
+                return {
+                    x: x,
+                    y: y,
+                    size: size,
+                    elements: elements,
+                    velocity: velocity,
+                    center: center,
+                    angle:0
+                }
+            }
+            
+            function player(x,y,center,velocity)
+            {
+                return {
+                    x:x,
+                    y:y,
+                    angle:-90,
+                    center:[7,5],
+                    velocity: velocity,
+                    elements: ship
+                }
+            }
+            
+            function drawObject(x,y,object,size,center,angle)
+            {
+                ctx.strokeStyle = '#FFF';
+                ctx.fillStyle = '#000';
+                ctx.lineWidth = 1;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                var tmp_elements = object;
+                
+                //console.debug(i);
+                
+                //for(var i=0; i<tmp_elements.length;i++)
+                //{
+                //    for(var j=0; j<tmp_elements[i].length;j+=2)
+                //    {
+                //        tmp_elements[i][j] = ( tmp_elements[i][j] * Math.cos(angle*(180/Math.PI)) ) - ( tmp_elements[i][j+1] * Math.sin(angle*(180/Math.PI)) );
+                //        tmp_elements[i][j+1] = ( tmp_elements[i][j] * Math.sin(angle*(180/Math.PI)) ) + ( tmp_elements[i][j+1] * Math.cos(angle*(180/Math.PI)) );
+                //    }
+                //}
+
+                ctx.save();
+                
+                ctx.translate(x-center[0], y-center[1]);
+                ctx.rotate(angle*(Math.PI/180));
+                ctx.translate(-center[0], -center[1]);
+                //ctx.translate(x, y);
+                //ctx.scale(size, size);       
+                for(var i=0; i<tmp_elements.length;i++)
+                {
+                    ctx.beginPath();
+                    for(var j=0; j<tmp_elements[i].length;j+=2)
+                    {
+                        //var a = ( tmp_elements[i][j] * Math.cos(angle*(180/Math.PI)) ) - ( tmp_elements[i][j+1] * Math.sin(angle*(180/Math.PI)) );
+                        //var b = ( tmp_elements[i][j] * Math.sin(angle*(180/Math.PI)) ) + ( tmp_elements[i][j+1] * Math.cos(angle*(180/Math.PI)) );
+                        
+                        if(j==0)
+                            //ctx.moveTo(a+x,b+y);
+                            ctx.moveTo(tmp_elements[i][j],tmp_elements[i][j+1]);
+                        else
+                            //ctx.lineTo(a+x,b+y);
+                            ctx.lineTo(tmp_elements[i][j],tmp_elements[i][j+1]);
+                    }
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+                //ctx.translate(-x, -y);
+                //ctx.translate(x, y);
+                //ctx.translate(-(center.x+x), -(center.y+y));
+                ctx.fill();
+                ctx.restore();
+            }
+            
+            function calculatePolygonSize(polygon)
+            {
+                var min_x = 0;
+                var min_y = 0;
+                var max_x = 0;
+                var max_y = 0;
+                
+                for(var i=0;i<polygon.length;i++)
+                {
+                    for(var j=0;j<polygon[i].length;j+=2)
+                    {
+                        var x = polygon[i][j];
+                        var y = polygon[i][j+1];
+                        min_x = min_x > x ? x : min_x;
+                        min_y = min_y > y ? y : min_y;
+                        max_x = max_x < x ? x : max_x;
+                        max_y = max_y < y ? y : max_y;                        
+                    }
+                }
+                return {width: max_x-min_x, height: max_y-min_y}
+            }
+            
+            function scale(elements,factor,center)
+            {
+                var e = elements;
+                var new_elements = new Array();
+                for(var j=0; j<e.length;j++)
+                {
+                    new_elements[j] = new Array();
+                    for(var k=0; k<e[j].length;k+=2)
+                    {
+                        var x = e[j][k];
+                        var y = e[j][k+1];
+                        
+                        var dx = center[0]-x;
+                        var dy = center[1]-y;
+                        
+                        dx*=factor;
+                        dy*=factor;
+                        
+                        new_elements[j][k] = e[j][k]+dx;
+                        new_elements[j][k+1] = e[j][k+1]+dy;
+                    }
+                }
+                return new_elements;
+            }
+            
+            function init() {
+                canvas = document.getElementById("canvas");
+                ctx = canvas.getContext("2d");
+                WIDTH = canvas.width;
+                HEIGHT = canvas.height;
+                //ctx.setTransform(1,0,0,1,WIDTH/2,HEIGHT/2);
+                
+                if(!canvas.getContext){
+                    return;
+                }
+
+                var offsetX=0, offsetY=0;
+
+                for(var obj = canvas; obj != null; obj = obj.offsetParent) {
+                    offsetX += obj.scrollLeft - obj.offsetLeft;
+                    offsetY += obj.scrollTop - obj.offsetTop;
+                }
+
+                canvas.addEventListener("mousemove", function(e) {
+                    mouse_x = e.x + offsetX;
+                    mouse_y = e.y + offsetY;
+                }, true);
+
+                canvas.addEventListener("mouseup", function(e) {
+                    if(e.button == 0) mouseState = false;
+                }, true);
+
+                canvas.addEventListener("mousedown", function(e) {
+                    if(e.button == 0) mouseState = true;
+                }, true);
+                
+                for( var i = 0; i < asteroidCount; i++)
+                {
+                    var x = Math.floor((Math.random()*(WIDTH-10)+10));
+                    var y = Math.floor((Math.random()*(HEIGHT-10)+10));
+                    var size = Math.floor((Math.random()*2)+3);
+                    //var angle = Math.floor((Math.random()*360));
+                    //console.debug(x+"|"+y);
+                    var elements = asteroid_forms[Math.floor((Math.random()*3))];
+                    var center = get_polygon_center(elements[0]);
+                    var velocity = [Math.floor((Math.random()*100)-50)*0.01,Math.floor((Math.random()*100)-50)*0.01];
+                    elements = scale(elements,size,center);
+                    
+                    asteroids.push(new asteroid(x,y,elements,size,velocity,center));
+                }
+                for( var i = 0; i < asteroids.length; i++)
+                {
+                    var dimensions = calculatePolygonSize(asteroids[i].elements);
+                    asteroids[i].width = dimensions.width;
+                    asteroids[i].height = dimensions.height;
+                }
+                
+                player = new player(WIDTH/2,HEIGHT/2,[7,5],{x:0,y:0});
+                console.debug(player);
+                
+                //console.debug(get_polygon_center(asteroid1[0]));
+
+                setInterval(draw, 10);
+                setInterval(update, 10);
+                setInterval(debug, 1000);
+                return true;
+            }
+
+            function circle(x,y,r,color) {
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI*2, true);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            function clear() {
+                ctx.clearRect(-WIDTH/2, -HEIGHT/2, WIDTH+WIDTH/2, HEIGHT+HEIGHT/2);
+            }
+
+            document.onkeydown = function (e) {
+                keyState[e.which] = true;
+            };
+
+            document.onkeyup = function (e) {
+                keyState[e.which] = false;
+            };
+            
+            function update()
+            {
+                for(var i=0;i<asteroids.length;i++)
+                {
+                    if(asteroids[i].x > WIDTH)
+                    {
+                        asteroids[i].x = 0;
+                    }
+                    else if(asteroids[i].x <= 0)
+                    {
+                        asteroids[i].x = WIDTH;
+                    }
+                    else if(asteroids[i].y > HEIGHT)
+                    {
+                        asteroids[i].y = 0;
+                    }
+                    else if(asteroids[i].y < 0)
+                    {
+                        asteroids[i].y = HEIGHT;
+                    }
+                    asteroids[i].x += asteroids[i].velocity[0];
+                    asteroids[i].y += asteroids[i].velocity[1];
+                }
+                if(keyState[37] == true)//LEFT
+                {
+                    player.angle -= 2;
+                }; 
+                if(keyState[38] == true)//UP
+                {
+                    var a = Math.cos(player.angle*(Math.PI/180));
+                    var b = Math.sin(player.angle*(Math.PI/180));
+                    player.velocity.x += a/Math.sqrt(a*a+b*b)*0.02;
+                    player.velocity.y += b/Math.sqrt(a*a+b*b)*0.02;
+                };
+                if(keyState[39] == true)//RIGHT
+                {
+                    player.angle += 2;
+                };
+                player.x += player.velocity.x;
+                player.y += player.velocity.y;
+                
+                if(player.x > WIDTH)
+                {
+                    player.x = 0;
+                }
+                else if(player.x <= 0)
+                {
+                    player.x = WIDTH;
+                }
+                else if(player.y > HEIGHT)
+                {
+                    player.y = 0;
+                }
+                else if(player.y < 0)
+                {
+                    player.y = HEIGHT;
+                }  
+            }
+
+            function draw() {
+                clear();
+
+                //drawObject(10,50,polygons);
+                //drawObject(10,30,ufo);
+                
+                if(mouseState == true)
+                {
+                   
+                }
+
+                if(keyState[80] == true) {
+                    
+                }
+
+                for(var i=0;i<asteroids.length;i++)
+                {
+                    //console.debug(asteroids[i].x, asteroids[i].y);
+                    drawObject(asteroids[i].x, asteroids[i].y, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    //drawObject(asteroids[i].x+WIDTH, asteroids[i].y, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    //drawObject(asteroids[i].x+WIDTH, asteroids[i].y+HEIGHT, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    //drawObject(asteroids[i].x, asteroids[i].y+HEIGHT, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    
+                    drawObject(asteroids[i].x+WIDTH, asteroids[i].y, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    drawObject(asteroids[i].x-WIDTH, asteroids[i].y, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    drawObject(asteroids[i].x, asteroids[i].y+HEIGHT, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    drawObject(asteroids[i].x, asteroids[i].y-HEIGHT, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    
+                    drawObject(asteroids[i].x+WIDTH, asteroids[i].y-HEIGHT, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    drawObject(asteroids[i].x-WIDTH, asteroids[i].y+HEIGHT, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    drawObject(asteroids[i].x+HEIGHT, asteroids[i].y+HEIGHT, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                    drawObject(asteroids[i].x-HEIGHT, asteroids[i].y-HEIGHT, asteroids[i].elements, asteroids[i].size, asteroids[i].center);
+                }
+                drawObject(player.x,player.y,player.elements,1,player.center,player.angle%360);
+
+                ctx.fillStyle = '#3C6';
+                ctx.fillText("asteroids: "+asteroids.length, 10, 20);
+            }
+            function debug()
+            {
+                console.debug(player.angle,player.velocity.x,player.velocity.y,player.x,player.y,player.center);
+            }
+            init();
+        </script>
+    </body>
 </html>

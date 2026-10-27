@@ -1,168 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> 
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Breakout — Afterschool</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#0d100e;color:#e8f0e9;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px}
-  .topbar{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-  .back{color:#7dffa3;text-decoration:none;font-size:.95rem}
-  .back:hover{text-decoration:underline}
-  h1{font-size:1.25rem;font-weight:600}
-  button{background:#151a16;color:#7dffa3;border:1px solid #7dffa3;border-radius:8px;padding:7px 14px;font-size:.9rem;cursor:pointer}
-  button:hover{background:#7dffa3;color:#0d100e}
-  .panel{background:#151a16;border-radius:14px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px}
-  .status{display:flex;gap:24px;font-size:1rem}
-  .status b{color:#7dffa3}
-  canvas{background:#0d100e;border:1px solid #2a332b;border-radius:10px;max-width:100%;height:auto;touch-action:none}
-  .hint{color:#93a396;font-size:.85rem;text-align:center}
-  .overlay{position:relative}
-  .gameover{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(13,16,14,.82);border-radius:10px;text-align:center;padding:16px}
-  .gameover.show{display:flex}
-  .gameover h2{font-size:1.6rem;color:#7dffa3}
-</style>
-</head>
+  <title>Javascript Breakout</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="viewport" content="width=device-width", initial-scale=1.0, user-scalable="no"/>
+  <link href="breakout.css" media="screen, print" rel="stylesheet" type="text/css" /> 
+</head> 
+ 
 <body>
-  <div class="topbar">
-    <a class="back" href="../../index.html">&larr; Afterschool</a>
-    <h1>Breakout</h1>
-    <button id="restartBtn" type="button">Restart</button>
-  </div>
-  <div class="panel">
-    <div class="status"><span>Score: <b id="score">0</b></span><span>Lives: <b id="lives">3</b></span></div>
-    <div class="overlay">
-      <canvas id="game" width="480" height="480"></canvas>
-      <div class="gameover" id="gameover">
-        <h2 id="overTitle">Game Over</h2>
-        <p id="finalScore"></p>
-        <button id="againBtn" type="button">Play Again</button>
+<a href="../../index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#141414;color:#f5f5f5;border:1px solid #333;padding:6px 12px;border-radius:999px;font-family:system-ui,sans-serif;font-size:13px;text-decoration:none">&#8592; Afterschool</a> 
+
+
+  <div id="breakout">
+    <canvas id="canvas">
+      <div class='unsupported'>
+        Sorry, this example cannot be run because your browser does not support the &lt;canvas&gt; element
+      </div>
+    </canvas>
+    <div id="levels">
+      <img id="next" class="disabled" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAKCAYAAABrGwT5AAAAB3RJTUUH2wUfAic0jEIcSwAAAAlwSFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAGySURBVHjadZHNSxtRFMXPe3cyM0bHqJggxMbSGKVW7UJpERTtIvGDCkIpKAYlLrpolYJLV/4HbrIQoerKv8CtpXRRFxaqIApCiwRBQUrR0Rg1M+OdiR9o2zsc3rz7zo85943Av+rd9whsKw2BLjj4AknjmGvNPLTRX+DIt7DwycVXDWWJ9/FqnSRivw5zz51nqRVsfDL/D6e+BoWmzr6IlibevAxRqFRF62NDmNl8zc8/+Vo0Jz9jfSF7Y5e34Ni2AUWfeRouft3XUkmKIiEEUKwRJuJh6qoz+gWfe757cM+OBjLT0aqiwV4GBQkPlNcK+AnTAxFqjxmDEGba83ux326qCJrzj4LacHdLkIiH1H0SflaRK06gKQIBnZBoLJNb+9mmzMXxE9R+XCa0jU6FyrUPHc0VBFkwupB+C0qo3FM5jV8ldNYb4kfmtGH/7NSSnCvZFDXo3AEs24HNcXjxZN2Im/lrVZSomEyEyeUU/o8Hv48uYuUlCtyN67i8tHCW45kcGzbvc+cSpk9A46/zVFjbPYHLCaRW27mzxDdUjcI9cfFLYbkrp5CKIX6cPThy6Ar9vIApXL5TsQAAAABJRU5ErkJggg=="   title="next level">
+      <img id="prev" class="disabled" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAKCAYAAAEcHDRvAAAAB3RJTUUH2wUfAigcPm+ofgAAAAlwSFlzAABOIAAATiABFn2Z3gAAAARnQU1BAACxjwv8YQUAAAHwSURBVHjabVJNaBNBFP7ezG4222TbpLEabbZFEgt6EhQFiUURpAdBL4JQECptRPDQo4IXrwVRsBcr2IPamydbUYnUGvAnVmjAEhIvGrEFbdUQaYnt7Pg2wV988GZ4M9/33vcNQxh4lhYBIwc/+q6+UUSZvNYaGjj5tLNxjOOvA8OTH/W90qpOjxQVYSjvCSICozxFabjnC2r0eVUXFte0j26wDl4uq589fErpaG+8x41YSMWC2BoNYItjIGILbDv3qkwNyqmis6Pb+3LmcEL6gEtTFTU970VxY3uNMPiiAkEucTNqwuGxUF7eG4d2bUjE24NIxvy00NVmoiNkoPCulhCPZpcnwqaAFIDBaUqgvraO/mvliWafofyti9klfXPum54qrmjiGn8GnX6ZHZle1oL3X2cYzM/sTDn7U50tFApIOH4GJVotibAlEOa6hcfaJsGS1Bg/OfdZX3m4kBPQOruwVFf8jNBCQLAwiwkh20A0xOIdE5sjJlx+hm425FiEXLmqfF7TfF/Zgvt1LBm3+4/t3Sjb2G27T7Ylor6KoIBa93DhzluVK9Vu40Mkg/s9dfrL2MCTDjKD1/ckW4+c2LdJxsImWDnGZxbVg/nqXf19JYPx3k+/Pf8vMrNd/A1G+fYAf4jHEPIsxnZX/oX9AGoypnbxkTY4AAAAAElFTkSuQmCC" title="previous level">
+      <span id="label">level:</span><span id="level"></span>
+    </div>
+    <div id="controls">
+      <input id='sound' type='checkbox' />
+      <label for='sound'>sound</label>
+    </div>
+    <div id="instructions" style='display:none;'>
+      <div class='keyboard'>
+        <b>space</b> to start<br>
+        <b>left/right</b> to move paddle<br>
+        <b>up/down</b> to change level
+      </div>
+      <div class='touch'>
+        <b>touch here</b> to start<br>
+        <b>drag</b> paddle to move<br>
       </div>
     </div>
-    <p class="hint">Mouse, touch, or arrow keys to move &middot; click or Space to launch</p>
   </div>
-<script>
-(function(){
-  var canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
-  var W=canvas.width,H=canvas.height;
-  var scoreEl=document.getElementById('score'),livesEl=document.getElementById('lives');
-  var overEl=document.getElementById('gameover'),overTitle=document.getElementById('overTitle'),finalEl=document.getElementById('finalScore');
-  var ROWS=5,COLS=8,BW=52,BH=18,GAP=6,OX=22,OY=56;
-  var COLORS=['#ff5d73','#ffb35d','#ffe45d','#7dffa3','#5db8ff'];
-  var paddle,ball,bricks,score,lives,state,keys={},raf;
 
-  function buildBricks(){
-    bricks=[];
-    for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)
-      bricks.push({x:OX+c*(BW+GAP),y:OY+r*(BH+GAP),alive:true,color:COLORS[r]});
-  }
-  function resetBall(){
-    ball={x:paddle.x+paddle.w/2,y:paddle.y-9,r:8,dx:0,dy:0};
-    state='ready';
-  }
-  function reset(){
-    paddle={w:84,h:12,x:W/2-42,y:H-30,speed:7};
-    score=0;lives=3;scoreEl.textContent='0';livesEl.textContent='3';
-    buildBricks();resetBall();
-    overEl.classList.remove('show');
-    cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
-  }
-  function launch(){
-    if(state!=='ready')return;
-    var a=-Math.PI/2+(Math.random()*0.6-0.3),sp=5;
-    ball.dx=Math.cos(a)*sp;ball.dy=Math.sin(a)*sp;
-    state='play';
-  }
-  function endGame(win){
-    state='over';
-    overTitle.textContent=win?'You Win!':'Game Over';
-    finalEl.textContent='You scored '+score+' points.';
-    overEl.classList.add('show');
-  }
-  function loop(){
-    update();draw();
-    if(state!=='over')raf=requestAnimationFrame(loop);
-  }
-  function update(){
-    if(keys.left)paddle.x-=paddle.speed;
-    if(keys.right)paddle.x+=paddle.speed;
-    if(paddle.x<0)paddle.x=0;
-    if(paddle.x>W-paddle.w)paddle.x=W-paddle.w;
-    if(state==='ready'){ball.x=paddle.x+paddle.w/2;ball.y=paddle.y-ball.r-1;return;}
-    if(state!=='play')return;
-    ball.x+=ball.dx;ball.y+=ball.dy;
-    if(ball.x-ball.r<0){ball.x=ball.r;ball.dx*=-1;}
-    if(ball.x+ball.r>W){ball.x=W-ball.r;ball.dx*=-1;}
-    if(ball.y-ball.r<0){ball.y=ball.r;ball.dy*=-1;}
-    if(ball.y-ball.r>H){
-      lives--;livesEl.textContent=lives;
-      if(lives<=0){draw();return endGame(false);}
-      resetBall();return;
-    }
-    if(ball.dy>0&&ball.y+ball.r>=paddle.y&&ball.y-ball.r<=paddle.y+paddle.h&&ball.x>=paddle.x&&ball.x<=paddle.x+paddle.w){
-      var rel=(ball.x-(paddle.x+paddle.w/2))/(paddle.w/2);
-      var ang=rel*(Math.PI/3),sp=Math.sqrt(ball.dx*ball.dx+ball.dy*ball.dy);
-      ball.dx=Math.sin(ang)*sp;ball.dy=-Math.cos(ang)*sp;
-      ball.y=paddle.y-ball.r-1;
-    }
-    for(var i=0;i<bricks.length;i++){
-      var b=bricks[i];
-      if(!b.alive)continue;
-      if(ball.x+ball.r>b.x&&ball.x-ball.r<b.x+BW&&ball.y+ball.r>b.y&&ball.y-ball.r<b.y+BH){
-        b.alive=false;score+=10;scoreEl.textContent=score;
-        var overlapX=Math.min(ball.x+ball.r-b.x,b.x+BW-(ball.x-ball.r));
-        var overlapY=Math.min(ball.y+ball.r-b.y,b.y+BH-(ball.y-ball.r));
-        if(overlapX<overlapY)ball.dx*=-1;else ball.dy*=-1;
-        break;
-      }
-    }
-    var any=false;
-    for(var j=0;j<bricks.length;j++)if(bricks[j].alive){any=true;break;}
-    if(!any)endGame(true);
-  }
-  function roundRect(x,y,w,h,r){
-    ctx.beginPath();
-    ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
-    ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
-  }
-  function draw(){
-    ctx.fillStyle='#0d100e';ctx.fillRect(0,0,W,H);
-    for(var i=0;i<bricks.length;i++){
-      var b=bricks[i];if(!b.alive)continue;
-      ctx.fillStyle=b.color;roundRect(b.x,b.y,BW,BH,4);ctx.fill();
-    }
-    ctx.fillStyle='#7dffa3';roundRect(paddle.x,paddle.y,paddle.w,paddle.h,6);ctx.fill();
-    ctx.fillStyle='#e8f0e9';
-    ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();
-    if(state==='ready'){
-      ctx.fillStyle='#93a396';ctx.font='15px sans-serif';ctx.textAlign='center';
-      ctx.fillText('Click or press Space to launch',W/2,H-70);
-    }
-  }
-  function pointerX(e){
-    var r=canvas.getBoundingClientRect();
-    return (e.clientX-r.left)*(W/r.width);
-  }
-  canvas.addEventListener('mousemove',function(e){paddle.x=Math.min(W-paddle.w,Math.max(0,pointerX(e)-paddle.w/2));});
-  canvas.addEventListener('touchstart',function(e){e.preventDefault();paddle.x=Math.min(W-paddle.w,Math.max(0,pointerX(e.touches[0])-paddle.w/2));launch();},{passive:false});
-  canvas.addEventListener('touchmove',function(e){e.preventDefault();paddle.x=Math.min(W-paddle.w,Math.max(0,pointerX(e.touches[0])-paddle.w/2));},{passive:false});
-  canvas.addEventListener('click',launch);
-  document.addEventListener('keydown',function(e){
-    var k=e.key.toLowerCase();
-    if(k==='arrowleft'||k==='a'){keys.left=true;e.preventDefault();}
-    else if(k==='arrowright'||k==='d'){keys.right=true;e.preventDefault();}
-    else if(k===' '){e.preventDefault();if(state==='over')reset();else launch();}
+  <script src="game.js"></script>
+  <script src="breakout.js"></script>
+  <script src="levels.js"></script>
+  <script>
+  Game.ready(function() {
+    var game = Game.start('canvas', Breakout);
   });
-  document.addEventListener('keyup',function(e){
-    var k=e.key.toLowerCase();
-    if(k==='arrowleft'||k==='a')keys.left=false;
-    else if(k==='arrowright'||k==='d')keys.right=false;
-  });
-  document.getElementById('restartBtn').addEventListener('click',reset);
-  document.getElementById('againBtn').addEventListener('click',reset);
-  reset();
-})();
-</script>
-</body>
+  </script>
+
+</body> 
 </html>

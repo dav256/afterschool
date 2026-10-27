@@ -1,0 +1,74 @@
+body {
+  background-color: #00ff11;
+}
+
+#game-area {
+  background-color: #00ff11;
+}
+
+#mode-wrapper {
+  color: #000000;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+a.snake-link, a.snake-link:link, a.snake-link:visited {
+color: #FCFC54;
+}
+
+a.snake-link:hover {
+color: #FfFf54;
+}
+
+.snake-pause-screen {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  background-color:black;
+  color:white;
+}
+
+.snake-panel-component {
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+  color: #000000;
+  background-color: #00ff11;
+}
+
+.snake-snakebody-block {
+  background-color: #FF0000;
+  border: 0px solid #000080;
+}
+
+.snake-snakebody-alive {
+background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAABw0lEQVQ4jWVUC64cIQwzn9mqp+v5etS3O5AqxGbCdqQRAhLHzoeCv38M62uxzIpjX7i3i+e61/YX7ytgho5SgOIHM0CahdOcD9gymLSTvcBnnGGs845ekwEeAN97sIOVzmnvQGMkFc7wZV9OlGryIou1WgpM1j9kR+YdLxnYuVrZUZlcwFpS8WU/w77jml8MBThPP1SCD7ITUQtVTiAk30lCAtrSxWxQer6rQFMqBhm2T5JBxw1QyKqFc7bZqlrYW+S74/d88JS3LbsBpe8UxtnA8d0szgY8GH4eOcgyC5kYMFsq1ADalXymF+V9RtyVrMkwUbS0ehr6iwzBHF5imCq3Vc+nuXeXpAmYhlDIho8qHwj/t02xx1lMD9A3cy3APsJpdXpj0hslKo/9mVkxtx7Bhx/c+1Hpy6doRi2ir71GLw96DaYlMW5seBPgnhS2h7FRVySLv4gBwfyvep1AtpJ8qZJi8TXDnstaIlDhY7GUEGR4l2hyVlE8ofdj4MBTj6lL8yq6rJvAncDKo2yCS8flEclgFzy10FuPQQWqUuAMXfIb+BSgZsn1h+hcVy45Xu7/0nvngfU2qlYlcruKMgEA/wDbhu1RiNaY6QAAAABJRU5ErkJggg==");
+}
+.snake-snakebody-dead {
+background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAABGdBTUEAALGOfPtRkwAAACBjSFJNAAB6JQAAgIMAAPn/AACA6AAAdTAAAOpgAAA6lwAAF2+XqZnUAAAAe0lEQVR4nGJkYFjBQC4ACCAWID5wQIIMnQ4OLwACiIlsa4EAIIAo0gwQQBRpBgggijQDBBBFmgECiCLNAAFEkWaAAKJIM0AAUaQZIIAo0gwQQBRpBgggijQDBBBFmgECiCLNAAFEkWaAAKJIM0AAUaQZIIAYKSmGAAIMAOydBHklgXKUAAAAAElFTkSuQmCC");
+}
+
+.snake-food-block {
+  background-color: #FF0000;
+  border: 0px solid #000080;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAACmklEQVQ4jVWU4XKbMBCEPwmEwU6aJv3Rmf7u+z9N36FN2zhpYgM2CHVuJRzHHgxYYm93bw/3m++p50DPP2ZGKhocnoWZmQmPo2FLRWDixMDACCxAAl17oNbOhToy43AENlx/DLQm6IweXnSuy2F3Uzmj85LXjIenYkNHRcXEIHYVNRVd2TyTtC/REvBin4iF5crWZcAzNQ2BoIcjk9h4/dvovww3UZciQea8cSpyKWBSEDnjpT9QAZWWnNjkoyJpJRc1LxO1SmwZBDoXML8CUng4AXuxMyFnRlq2AspgTgUWIi0byTxz4iRTsvTarDWZWWQrHx01kZGJnpamWNKI+1xaEVQ0sNBx4EjPSQXqJPLzpb8VO4HOLHIzFdlBUheSii+lkUGNOV9Jdz+okitCs6B8/X6fBNRxyx138unIGxa3QMdYCO15ZM9sDCk8UnHHS1oqgbGHG8nNhSjJq/S1+0HNe+CeDc8Wm1iakUr7k8JTSZbXJDjO8m4Wq1pDEItNjfbP8nPLV3zUrTGzLR+PqJU8XgeeZL3Bd+q8gQ7slEuvsNvA+qmMUA5vBo66jup/EF/zzeTv1RKqVjwnRhyRjpauFBDDWEBzINIF1H7r4txZLHtGsVzkaU7vKyhuD+y4sWB/HJ1JhudZcCqWY76uvfKHEBtFZmsAKpDkYc2Xd4bp0ll3yWQe/KgMNmXfKz1HDsqoQXo+lZUFvn2mPly9kjaFnbuCbegU5Lk8NgC/+Klxu+eOTqZY247w5PGrHOvm+tBqg4k1KOuoSbQi60SMnOTpXx455BmB5PHr6ycPeo7Iu685zoGWllt13EBtz8gLPXsN5qBAHcEnA8wvrPUNnCOUDxNv47VOxg072kuMjEDPDfey5MALjD3/ARazTL0y1jooAAAAAElFTkSuQmCC");
+}
+
+.snake-playing-field {
+  background-color: #000000;
+  border: 0px solid #000000;
+}
+
+.snake-game-container {
+  background-color: #00ff11;
+}
+
+.snake-welcome-dialog {
+  background-color: #000000;
+  color: #00ff11;
+  font-family: Verdana, arial, helvetica, sans-serif;
+}
+
+.snake-try-again-dialog, .snake-win-dialog {
+  background-color: #000000;
+  color: #ff0000;
+  font-family: Verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+}

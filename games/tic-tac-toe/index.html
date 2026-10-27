@@ -1,169 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tic-Tac-Toe — Afterschool</title>
-<style>
-  :root{--bg:#0d100e;--panel:#151a16;--accent:#7dffa3;--ink:#e8f0e9;--muted:#93a396;--line:#243028}
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;min-height:100vh;padding:1.2rem 1rem 2.5rem}
-  .wrap{max-width:480px;margin:0 auto}
-  .topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:.8rem 1.1rem}
-  .topbar a.back{color:var(--muted);text-decoration:none;font-size:.92rem;white-space:nowrap}
-  .topbar a.back:hover{color:var(--accent)}
-  .topbar h1{font-size:1.15rem;font-weight:600;text-align:center}
-  button{background:var(--accent);color:#0d100e;border:none;border-radius:999px;padding:.55rem 1.15rem;font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap}
-  button:hover{filter:brightness(1.08)}
-  .modes{display:flex;gap:.5rem;justify-content:center;margin:1.1rem 0 .2rem}
-  .modes button{background:var(--panel);color:var(--muted);border:1px solid var(--line)}
-  .modes button.active{background:var(--accent);color:#0d100e;border-color:var(--accent)}
-  .status{display:flex;justify-content:space-between;gap:1rem;margin:.9rem .2rem .4rem;font-size:.98rem}
-  .status b{color:var(--accent);font-weight:600}
-  .msg{text-align:center;font-size:1.08rem;min-height:1.5em;margin:.3rem 0 .3rem}
-  .msg b{color:var(--accent)}
-  .hint{color:var(--muted);font-size:.85rem;margin:0 .2rem 1.1rem;text-align:center}
-  .board{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;max-width:320px;margin:0 auto}
-  .cell{aspect-ratio:1;background:var(--panel);border:1px solid var(--line);border-radius:14px;font-size:2.4rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s ease}
-  .cell:not(:disabled):hover{border-color:var(--accent)}
-  .cell.x{color:var(--accent)}
-  .cell.o{color:#ffd97d}
-  .cell.win{background:#1d2b20;border-color:var(--accent)}
-  .cell:disabled{cursor:default}
-  .controls{text-align:center;margin-top:1.3rem}
-</style>
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Tic-Tac-Toe AI</title>
+        <link rel = 'stylesheet' type = 'text/css' href = 'styles/ui.css'>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body>
-<div class="wrap">
-  <div class="topbar">
-    <a class="back" href="../../index.html">&larr; Afterschool</a>
-    <h1>Tic-Tac-Toe</h1>
-    <button id="roundBtnTop" type="button">New Round</button>
-  </div>
-  <div class="modes">
-    <button type="button" id="modeCpu" class="active">vs Computer</button>
-    <button type="button" id="mode2p">2 Players</button>
-  </div>
-  <div class="status">
-    <span>X wins: <b id="tallyX">0</b></span>
-    <span>Draws: <b id="tallyD">0</b></span>
-    <span>O wins: <b id="tallyO">0</b></span>
-  </div>
-  <p class="msg" id="msg">X goes first.</p>
-  <p class="hint">Get three in a row — across, down, or diagonal. In vs Computer mode you play X and the computer plays O.</p>
-  <div class="board" id="board"></div>
-  <div class="controls">
-    <button id="roundBtn" type="button">New Round</button>
-  </div>
-</div>
-<script>
-(function(){
-  "use strict";
-  var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  var boardEl = document.getElementById("board");
-  var msgEl = document.getElementById("msg");
-  var tallyX = document.getElementById("tallyX");
-  var tallyO = document.getElementById("tallyO");
-  var tallyD = document.getElementById("tallyD");
-  var cells = [], board = [], turn = "X", over = false, mode = "cpu";
-  var score = { X: 0, O: 0, D: 0 };
 
-  for (var i = 0; i < 9; i++){
-    (function(idx){
-      var c = document.createElement("button");
-      c.type = "button"; c.className = "cell";
-      c.addEventListener("click", function(){ play(idx); });
-      boardEl.appendChild(c); cells.push(c);
-    })(i);
-  }
-  function winnerOf(b){
-    for (var k = 0; k < LINES.length; k++){
-      var L = LINES[k];
-      if (b[L[0]] && b[L[0]] === b[L[1]] && b[L[1]] === b[L[2]]) return { who: b[L[0]], line: L };
-    }
-    return null;
-  }
-  function emptyCells(b){
-    var out = [];
-    for (var j = 0; j < 9; j++) if (!b[j]) out.push(j);
-    return out;
-  }
-  function render(){
-    for (var j = 0; j < 9; j++){
-      cells[j].textContent = board[j] || "";
-      cells[j].className = "cell" + (board[j] ? " " + board[j].toLowerCase() : "");
-      cells[j].disabled = over || !!board[j];
-    }
-  }
-  function finish(res){
-    over = true;
-    if (res){
-      res.line.forEach(function(idx){ cells[idx].classList.add("win"); });
-      score[res.who]++;
-      msgEl.innerHTML = "<b>" + res.who + "</b> wins the round!";
-    } else {
-      score.D++;
-      msgEl.textContent = "It's a draw.";
-    }
-    tallyX.textContent = score.X; tallyO.textContent = score.O; tallyD.textContent = score.D;
-    cells.forEach(function(c){ c.disabled = true; });
-  }
-  function play(idx){
-    if (over || board[idx]) return;
-    board[idx] = turn;
-    var res = winnerOf(board);
-    if (res || emptyCells(board).length === 0){ render(); finish(res); return; }
-    turn = (turn === "X") ? "O" : "X";
-    render();
-    if (mode === "cpu" && turn === "O" && !over){
-      msgEl.textContent = "Computer is thinking…";
-      cells.forEach(function(c){ c.disabled = true; });
-      setTimeout(function(){
-        var mv = cpuMove();
-        if (mv >= 0) play(mv);
-      }, 420);
-    } else {
-      msgEl.innerHTML = "<b>" + turn + "</b>'s turn.";
-    }
-  }
-  function findWinning(b, who){
-    var empt = emptyCells(b);
-    for (var j = 0; j < empt.length; j++){
-      b[empt[j]] = who;
-      var w = winnerOf(b);
-      b[empt[j]] = "";
-      if (w && w.who === who) return empt[j];
-    }
-    return -1;
-  }
-  function cpuMove(){
-    var b = board.slice();
-    var win = findWinning(b, "O");   if (win >= 0) return win;   // win when it can
-    var block = findWinning(b, "X"); if (block >= 0) return block; // block the player
-    if (!b[4]) return 4;                                          // take the center
-    var corners = [0,2,6,8].filter(function(c){ return !b[c]; });
-    if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
-    var rest = emptyCells(b);
-    return rest.length ? rest[Math.floor(Math.random() * rest.length)] : -1;
-  }
-  function newRound(){
-    board = ["","","","","","","","",""];
-    turn = "X"; over = false;
-    render();
-    msgEl.innerHTML = "<b>X</b> goes first.";
-  }
-  function setMode(m){
-    mode = m;
-    document.getElementById("modeCpu").classList.toggle("active", m === "cpu");
-    document.getElementById("mode2p").classList.toggle("active", m === "2p");
-    newRound();
-  }
-  document.getElementById("modeCpu").addEventListener("click", function(){ setMode("cpu"); });
-  document.getElementById("mode2p").addEventListener("click", function(){ setMode("2p"); });
-  document.getElementById("roundBtn").addEventListener("click", newRound);
-  document.getElementById("roundBtnTop").addEventListener("click", newRound);
-  newRound();
-})();
-</script>
-</body>
+    <body>
+<a href="../../index.html" style="position:fixed;top:10px;left:10px;z-index:9999;background:#141414;color:#f5f5f5;border:1px solid #333;padding:6px 12px;border-radius:999px;font-family:system-ui,sans-serif;font-size:13px;text-decoration:none">&#8592; Afterschool</a>
+        <div class = 'main-container'>
+            <div class = 'board'>
+                <!-- data-indx following cell divs represents cell index in 1D array representation -->
+                <div class='cell' data-indx = "0" ></div>
+                <div class='cell' data-indx = "1" ></div>
+                <div class='cell' data-indx = "2" ></div>
+                <div class='cell' data-indx = "3" ></div>
+                <div class='cell' data-indx = "4" ></div>
+                <div class='cell' data-indx = "5" ></div>
+                <div class='cell' data-indx = "6" ></div>
+                <div class='cell' data-indx = "7" ></div>
+                <div class='cell' data-indx = "8" ></div>
+            </div>
+
+            <div class = 'control'>
+                <!-- div.intial displays the starting controls -->
+                <div class = 'intial'>
+                    <div class = 'difficulty'>
+                        <span class = 'level not-selected' id = "blind">Blind</span>
+                        <span class = 'level not-selected' id = "novice">Novice</span>
+                        <span class = 'level not-selected' id = "master">Master!</span>
+                    </div>
+
+                    <div class='start'> Start </div>
+                </div>
+
+                <!-- div.ingame displays in-game messages and controls -->
+                <div class = 'ingame' id="human">It's your turn ...</div>
+                <div class = 'ingame' id="ai">
+                    <img src = "data:image/png;base64,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" id = "robot" class = "robot" />
+                    <p>Waint for it ...</p>
+                </div>
+                <div class = 'ingame' id="won">You won !</div>
+                <div class = 'ingame' id="lost">You lost !</div>
+                <div class = 'ingame' id="draw">It's a Draw</div>
+            </div>
+        </div>
+
+        <script src = "scripts/jquery-1.10.1.min.js"></script>
+        <script src = "scripts/ui.js"></script>
+        <script src = "scripts/game.js"></script>
+        <script src = "scripts/ai.js"></script>
+        <script src = "scripts/control.js"></script>
+    </body>
 </html>
