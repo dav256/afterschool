@@ -18,4 +18,5 @@ const DEFAULT_GAMES = [
   { id:"checkers", name:"Checkers", category:"Board", path:"games/checkers/index.html", note:"Local · vs computer", icon:"⚫", color:"#ef4444" },
   { id:"connect-four", name:"Connect Four", category:"Board", path:"games/connect-four/index.html", note:"Local · 2 players", icon:"🟡", color:"#3b82f6" },
   { id:"battleship", name:"Battleship", category:"Board", popular:true, path:"games/battleship/index.html", note:"Local · vs computer", icon:"🚢", color:"#7dd3fc" },
+  { id:"footballers", name:"Footballers", category:"Sports", popular:true, path:"games/footballers/index.html", note:"Local · 8-bit football", icon:"🏈", color:"#f97316" },
 ];

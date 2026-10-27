@@ -4,7 +4,7 @@
 
 ![last commit](https://img.shields.io/github/last-commit/dav256/afterschool?style=for-the-badge) ![repo size](https://img.shields.io/github/repo-size/dav256/afterschool?style=for-the-badge) ![GitHub stars](https://img.shields.io/github/stars/dav256/afterschool?style=for-the-badge&logo=github) ![HTML](https://img.shields.io/badge/HTML-E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-663399?style=for-the-badge&logo=css&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-> **Ready to play:** Eighteen games are included and playable, and more can be added as folders.
+> **Ready to play:** Nineteen games are included and playable, and more can be added as folders.
 
 **Afterschool is a local games portal with a dark, minimal theme.**
 
@@ -30,6 +30,7 @@ It is designed to run locally: open the page, choose a game, or use the in-page 
 - **Checkers** — Board · vs computer (see Credits)
 - **Connect Four** — Board · 2 players (see Credits)
 - **Battleship** — Board · vs computer (see Credits)
+- **Footballers** — Sports · original 8-bit football (see Credits)
 
 ## Credits
 
@@ -42,6 +43,7 @@ Some games are adapted from open-source projects on GitHub, with their licenses 
 - **Checkers** from stroibot/Checkers — MIT License (`games/checkers/LICENSE.md`)
 - **Connect Four** from bryanbraun/connect-four — MIT License (`games/connect-four/LICENSE`)
 - **Battleship** (Battleboat) from billmei/battleboat — MIT License (`games/battleship/LICENSE.txt`)
+- **Footballers** (8-Bit Gridiron) by Demetrius Baker & family — MIT License (`games/footballers/LICENSE`); original art and sound (see `games/footballers/ASSET_LICENSES.md`)
 
 The remaining games were written for this repo.
 
