@@ -51,24 +51,16 @@ function recordPlay(g) {
 
 /* ---------- cloak ---------- */
 
-function svgIcon(letter, bg, fg) {
-  const svg =
-    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
-    "<rect width='64' height='64' rx='12' fill='" + bg + "'/>" +
-    "<text x='32' y='44' font-family='Arial,sans-serif' font-size='34' font-weight='bold' " +
-    "fill='" + fg + "' text-anchor='middle'>" + letter + "</text></svg>";
-  return "data:image/svg+xml," + encodeURIComponent(svg);
-}
-
 const CLOAKS = [
   { id: "none",      name: "Afterschool",  title: null,                          icon: null },
-  { id: "classroom", name: "Classroom",    title: "Classes",                     icon: svgIcon("C", "#0f9d58", "#ffffff") },
-  { id: "docs",      name: "Google Docs",  title: "Google Docs",                 icon: svgIcon("D", "#2684fc", "#ffffff") },
-  { id: "drive",     name: "Google Drive", title: "My Drive - Google Drive",     icon: svgIcon("D", "#0f9d58", "#ffffff") },
-  { id: "google",    name: "Google",       title: "Google",                      icon: svgIcon("G", "#4285f4", "#ffffff") },
-  { id: "canvas",    name: "Canvas",       title: "Dashboard",                   icon: svgIcon("C", "#e72429", "#ffffff") },
-  { id: "wikipedia", name: "Wikipedia",    title: "Wikipedia",                   icon: svgIcon("W", "#ffffff", "#202122") },
-  { id: "khan",      name: "Khan Academy", title: "Khan Academy",                icon: svgIcon("K", "#14bf96", "#ffffff") },
+  { id: "classroom", name: "Google Classroom", title: "Classes",                 icon: "https://ssl.gstatic.com/classroom/favicon.png" },
+  { id: "docs",      name: "Google Docs",  title: "Google Docs",                 icon: "https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" },
+  { id: "drive",     name: "Google Drive", title: "My Drive - Google Drive",     icon: "https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png" },
+  { id: "google",    name: "Google",       title: "Google",                      icon: "https://www.google.com/favicon.ico" },
+  { id: "schoology", name: "Schoology",    title: "Home | Schoology",            icon: "https://www.schoology.com/favicon.ico" },
+  { id: "canvas",    name: "Canvas",       title: "Dashboard",                   icon: "https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e21687aca37a684712c92911ef29acc4.ico" },
+  { id: "khan",      name: "Khan Academy", title: "Khan Academy",                icon: "https://cdn.kastatic.org/images/favicon.ico?v=16b001c73b8b" },
+  { id: "wikipedia", name: "Wikipedia",    title: "Wikipedia",                   icon: "https://www.wikipedia.org/static/favicon/wikipedia.ico" },
 ];
 
 function loadCloak() {
@@ -155,7 +147,7 @@ function applyStyle() {
 
 function esc(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;",
   }[c]));
 }
 
@@ -317,7 +309,18 @@ function renderCloakTab() {
   CLOAKS.forEach((p) => {
     const b = document.createElement("button");
     b.className = "preset" + (p.id === c.preset ? " active" : "");
-    b.textContent = p.name;
+    if (p.icon) {
+      const img = document.createElement("img");
+      img.src = p.icon;
+      img.alt = "";
+      img.width = 18;
+      img.height = 18;
+      img.style.marginRight = "8px";
+      img.style.verticalAlign = "middle";
+      img.style.borderRadius = "3px";
+      b.appendChild(img);
+    }
+    b.appendChild(document.createTextNode(p.name));
     b.addEventListener("click", () => {
       const cur = loadCloak();
       cur.preset = p.id;
@@ -484,7 +487,7 @@ function init() {
   // data tools
   document.getElementById("data-export").addEventListener("click", () => {
     const data = {
-      games: loadJSON(LS_GAMES, null),
+      games: games,
       style: loadStyle(),
       cloak: loadCloak(),
       favs: favs,
@@ -494,63 +497,41 @@ function init() {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "afterschool-library.json";
+    a.download = "afterschool-backup.json";
     a.click();
-    URL.revokeObjectURL(a.href);
   });
-  const importInput = document.getElementById("data-import");
-  document.getElementById("data-import-btn").addEventListener("click", () => importInput.click());
-  importInput.addEventListener("change", () => {
-    const file = importInput.files[0];
+
+  document.getElementById("data-import").addEventListener("change", (e) => {
+    const file = e.target.files[0];
     if (!file) return;
-    file.text().then((text) => {
+    const reader = new FileReader();
+    reader.onload = () => {
       try {
-        const data = JSON.parse(text);
-        if (data.games) saveJSON(LS_GAMES, data.games);
-        if (data.style) saveJSON(LS_STYLE, data.style);
-        if (data.cloak) saveJSON(LS_CLOAK, data.cloak);
-        if (data.favs) saveJSON(LS_FAVS, data.favs);
-        if (data.plays) saveJSON(LS_PLAYS, data.plays);
-        if (data.recents) saveJSON(LS_RECENTS, data.recents);
-        location.reload();
-      } catch (e) { alert("That file could not be imported."); }
-    });
+        const data = JSON.parse(reader.result);
+        if (Array.isArray(data.games)) { games = data.games; saveGames(); }
+        if (data.style) { saveJSON(LS_STYLE, data.style); applyStyle(); }
+        if (data.cloak) { saveCloak(data.cloak); applyCloak(); }
+        if (Array.isArray(data.favs)) { favs = data.favs; saveJSON(LS_FAVS, favs); }
+        if (data.plays) { plays = data.plays; saveJSON(LS_PLAYS, plays); }
+        if (Array.isArray(data.recents)) { recents = data.recents; saveJSON(LS_RECENTS, recents); }
+        render();
+        alert("Import complete");
+      } catch (err) {
+        alert("Invalid backup file");
+      }
+    };
+    reader.readAsText(file);
   });
+
   document.getElementById("data-reset").addEventListener("click", () => {
-    if (!confirm("Reset games, style, cloak, favorites, recents, and play counts on this device?")) return;
-    [LS_GAMES, LS_STYLE, LS_CLOAK, LS_FAVS, LS_PLAYS, LS_RECENTS].forEach((k) => localStorage.removeItem(k));
+    if (!confirm("Reset all local settings and game order?")) return;
+    localStorage.removeItem(LS_GAMES);
+    localStorage.removeItem(LS_STYLE);
+    localStorage.removeItem(LS_CLOAK);
+    localStorage.removeItem(LS_FAVS);
+    localStorage.removeItem(LS_PLAYS);
+    localStorage.removeItem(LS_RECENTS);
     location.reload();
-  });
-
-  // cloak tab controls
-  document.getElementById("cloak-title").addEventListener("input", (e) => {
-    const c = loadCloak();
-    c.customTitle = e.target.value.trim();
-    saveCloak(c);
-    applyCloak();
-  });
-  document.getElementById("cloak-auto").addEventListener("change", (e) => {
-    const c = loadCloak();
-    c.auto = e.target.checked;
-    saveCloak(c);
-  });
-  document.getElementById("cloak-panic-key").addEventListener("change", (e) => {
-    const c = loadCloak();
-    c.panicKey = e.target.value;
-    saveCloak(c);
-  });
-  document.getElementById("cloak-panic-url").addEventListener("input", (e) => {
-    const c = loadCloak();
-    c.panicUrl = e.target.value.trim();
-    saveCloak(c);
-  });
-  document.getElementById("btn-blank").addEventListener("click", openBlank);
-
-  document.getElementById("admin-logout").addEventListener("click", () => {
-    document.getElementById("admin-panel").hidden = true;
-    document.getElementById("admin-login").hidden = false;
-    document.getElementById("admin-pass").value = "";
-    modal.hidden = true;
   });
 }
 
