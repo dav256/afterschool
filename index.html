@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <canvas id="particle-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;display:none;"></canvas>
   <div class="app">
     <aside class="sidebar">
       <a href="./" class="logo"><img src="logo-white.svg" alt="Afterschool" class="logo-img" /></a>
@@ -129,11 +130,12 @@
         <input type="color" id="style-accent" value="#f5f5f5" />
 
         <label style="margin-top:16px">Background</label>
-        <p class="muted" style="margin-bottom:8px">Shown behind the whole site.</p>
-        <div class="row" style="margin-bottom:10px">
-          <button type="button" class="pill-btn" id="bg-none" style="flex:1">None</button>
-          <button type="button" class="pill-btn" id="bg-color" style="flex:1">Color</button>
-          <button type="button" class="pill-btn" id="bg-image" style="flex:1">Image</button>
+        <p class="muted" style="margin-bottom:8px">Shown behind the whole site. Dust adds subtle floating particles (Fern-style).</p>
+        <div class="row" style="margin-bottom:10px;flex-wrap:wrap;gap:6px">
+          <button type="button" class="pill-btn" id="bg-none" style="flex:1;min-width:70px">None</button>
+          <button type="button" class="pill-btn" id="bg-color" style="flex:1;min-width:70px">Color</button>
+          <button type="button" class="pill-btn" id="bg-image" style="flex:1;min-width:70px">Image</button>
+          <button type="button" class="pill-btn" id="bg-dust" style="flex:1;min-width:70px">Dust</button>
         </div>
         <div id="bg-color-controls" hidden>
           <label>Background color</label>
