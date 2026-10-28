@@ -34,6 +34,7 @@
         </div>
         <div class="nav-group">
           <div class="nav-label">Tools</div>
+          <button class="nav-item" id="btn-stats">Stats</button>
           <button class="nav-item" id="btn-settings">Settings</button>
           <button class="nav-item" id="btn-admin">Admin panel</button>
           <a class="nav-item" href="dmca.html" style="text-decoration:none;display:block">Copyright / DMCA</a>
@@ -131,6 +132,19 @@
         <label style="margin-top:12px">Tagline</label>
         <input type="text" id="style-tagline" value="Local games only. No external embeds." />
         <button class="btn" id="style-save" style="margin-top:16px;width:100%">Save style</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div class="modal" id="stats-modal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Stats</h3>
+        <button class="modal-close" id="stats-close">×</button>
+      </div>
+      <div id="stats-content">
+        <p class="muted">Loading...</p>
       </div>
     </div>
   </div>
