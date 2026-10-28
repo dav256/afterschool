@@ -176,7 +176,7 @@
   </div>
 
   <div class="modal" id="admin-modal" hidden>
-    <div class="modal-card">
+    <div class="modal-card" style="max-width:560px">
       <div class="modal-head">
         <h3>Admin</h3>
         <button class="modal-close" id="admin-close">×</button>
@@ -188,53 +188,94 @@
         <p class="muted" style="margin-top:10px;font-size:0.8rem">Default: <code>afterschool</code></p>
       </div>
       <div id="admin-panel" hidden>
-        <div class="admin-tabs">
+        <div class="admin-tabs" style="flex-wrap:wrap;gap:4px">
           <button class="admin-tab active" data-tab="games">Games</button>
-          <button class="admin-tab" data-tab="add">Add game</button>
-          <button class="admin-tab" data-tab="tools">Tools</button>
+          <button class="admin-tab" data-tab="featured">Featured</button>
           <button class="admin-tab" data-tab="announce">Announce</button>
+          <button class="admin-tab" data-tab="appearance">Appearance</button>
+          <button class="admin-tab" data-tab="users">Users</button>
+          <button class="admin-tab" data-tab="stats">Stats</button>
+          <button class="admin-tab" data-tab="links">Links</button>
+          <button class="admin-tab" data-tab="tools">Tools</button>
         </div>
+
         <div id="tab-games" class="admin-tab-content">
-          <p class="muted" style="margin-bottom:10px">Drag to reorder. Remove deletes from the list only. Play counts are tracked on this device.</p>
+          <p class="muted" style="margin-bottom:10px">Drag to reorder. Remove hides the game. Play counts tracked locally.</p>
           <ul id="admin-game-list" class="admin-list"></ul>
         </div>
-        <div id="tab-add" class="admin-tab-content" hidden>
-          <p class="muted" style="margin-bottom:12px">
-            First put the game files in a folder like <code>games/my-game/index.html</code>, then register it here.
-          </p>
-          <label>Name</label>
-          <input type="text" id="add-name" placeholder="Retro Bowl" />
-          <label>Category</label>
-          <select id="add-category">
-            <option>Arcade</option><option>Sports</option><option>Racing</option>
-            <option>Puzzle</option><option>Adventure</option><option>Multiplayer</option>
-            <option>Casual</option><option>Action</option>
-          </select>
-          <label>Local path (relative to site root)</label>
-          <input type="text" id="add-path" placeholder="games/retro-bowl/index.html" />
-          <label><input type="checkbox" id="add-popular" /> Popular</label>
-          <button class="btn" id="add-save" style="margin-top:16px;width:100%">Add game</button>
+
+        <div id="tab-featured" class="admin-tab-content" hidden>
+          <p class="muted" style="margin-bottom:10px">Select up to 4 games to feature at the top.</p>
+          <div id="featured-list"></div>
+          <button class="btn" id="featured-save" style="margin-top:12px;width:100%">Save featured</button>
         </div>
+
+        <div id="tab-announce" class="admin-tab-content" hidden>
+          <label>Announcement banner</label>
+          <input type="text" id="admin-announce-text" placeholder="e.g. New games added this week!" />
+          <label style="margin-top:10px"><input type="checkbox" id="admin-announce-enabled" /> Show banner</label>
+          <button class="btn" id="admin-announce-save" style="margin-top:12px;width:100%">Save announcement</button>
+          <button class="btn btn-ghost" id="admin-announce-clear" style="margin-top:8px;width:100%">Clear</button>
+        </div>
+
+        <div id="tab-appearance" class="admin-tab-content" hidden>
+          <label>Default background for new visitors</label>
+          <select id="admin-default-bg">
+            <option value="none">None</option>
+            <option value="dust">Dust</option>
+            <option value="snow">Snow</option>
+            <option value="fireplace">Fireplace</option>
+            <option value="stars">Stars</option>
+            <option value="rain">Rain</option>
+            <option value="christmas">Christmas</option>
+          </select>
+          <label style="margin-top:12px">Default accent color</label>
+          <input type="color" id="admin-default-accent" value="#f5f5f5" />
+          <label style="margin-top:12px">Site name</label>
+          <input type="text" id="admin-site-name" value="afterschool" />
+          <label style="margin-top:12px">Tagline</label>
+          <input type="text" id="admin-site-tagline" />
+          <label style="margin-top:16px"><input type="checkbox" id="admin-maintenance" /> Maintenance mode</label>
+          <input type="text" id="admin-maintenance-msg" placeholder="We'll be back soon" style="margin-top:6px" />
+          <label style="margin-top:16px">Custom CSS</label>
+          <textarea id="admin-custom-css" rows="4" placeholder="/* extra CSS */" style="width:100%;font-family:monospace;font-size:12px"></textarea>
+          <button class="btn" id="appearance-save" style="margin-top:12px;width:100%">Save appearance</button>
+        </div>
+
+        <div id="tab-users" class="admin-tab-content" hidden>
+          <p class="muted" style="margin-bottom:10px">Local accounts on this device.</p>
+          <div id="user-list"></div>
+          <label style="margin-top:16px"><input type="checkbox" id="admin-login-required" /> Require login to play</label>
+          <button class="btn" id="users-save" style="margin-top:12px;width:100%">Save</button>
+        </div>
+
+        <div id="tab-stats" class="admin-tab-content" hidden>
+          <p class="muted" style="margin-bottom:10px">Play counts (this device).</p>
+          <div id="stats-list"></div>
+          <button class="btn btn-ghost" id="stats-export" style="margin-top:12px;width:100%">Export stats JSON</button>
+        </div>
+
+        <div id="tab-links" class="admin-tab-content" hidden>
+          <label>Discord Server ID</label>
+          <input type="text" id="admin-discord-id" placeholder="123456789012345678" />
+          <label style="margin-top:12px">Partner links (one per line: Name | URL)</label>
+          <textarea id="admin-partners" rows="4" placeholder="Fern | https://fern.best&#10;Refract | https://refract.best" style="width:100%"></textarea>
+          <button class="btn" id="links-save" style="margin-top:12px;width:100%">Save links</button>
+        </div>
+
         <div id="tab-tools" class="admin-tab-content" hidden>
           <label>Change admin password</label>
           <input type="password" id="admin-new-pass" placeholder="New password" />
           <button class="btn" id="admin-change-pass" style="margin-top:8px;width:100%">Update password</button>
-          <label style="margin-top:16px">Export / Import games</label>
+          <label style="margin-top:16px">Backup / Restore</label>
           <div class="row" style="gap:8px;margin-top:6px">
-            <button class="btn btn-ghost" id="admin-export" style="flex:1">Export JSON</button>
-            <button class="btn btn-ghost" id="admin-import" style="flex:1">Import JSON</button>
+            <button class="btn btn-ghost" id="admin-export-all" style="flex:1">Export all</button>
+            <button class="btn btn-ghost" id="admin-import-all" style="flex:1">Import all</button>
           </div>
           <input type="file" id="admin-import-file" accept=".json" hidden />
-          <label style="margin-top:16px">Discord Server ID (for chat widget)</label>
-          <input type="text" id="admin-discord-id" placeholder="e.g. 123456789012345678" />
-          <button class="btn" id="admin-save-discord" style="margin-top:8px;width:100%">Save Discord ID</button>
+          <button class="btn btn-ghost" id="admin-clear-data" style="margin-top:16px;width:100%;color:#f55">Clear all local data</button>
         </div>
-        <div id="tab-announce" class="admin-tab-content" hidden>
-          <label>Site announcement (shows at top for everyone)</label>
-          <input type="text" id="admin-announce-text" placeholder="e.g. New games added!" />
-          <button class="btn" id="admin-announce-save" style="margin-top:8px;width:100%">Post announcement</button>
-          <button class="btn btn-ghost" id="admin-announce-clear" style="margin-top:8px;width:100%">Clear announcement</button>
-        </div>
+
         <button class="btn btn-ghost" id="admin-logout" style="margin-top:20px;width:100%">Logout</button>
       </div>
     </div>
@@ -249,7 +290,7 @@
       </div>
       <p class="muted" style="margin-bottom:12px">Live Discord chat. Join the server to talk with everyone.</p>
       <iframe src="https://discord.com/widget?id=YOUR_SERVER_ID&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="border-radius:10px;background:#1e1e1e"></iframe>
-      <p class="muted" style="margin-top:10px;font-size:0.8rem">Enable the Server Widget in Discord Server Settings → Widget, then set the Server ID in Admin → Tools.</p>
+      <p class="muted" style="margin-top:10px;font-size:0.8rem">Enable the Server Widget in Discord Server Settings → Widget, then set the Server ID in Admin → Links.</p>
     </div>
   </div>
 
