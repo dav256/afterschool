@@ -1,0 +1,28 @@
+
+/****************************************/
+/* common styles used for v1 through v4 */
+/****************************************/
+
+body          { font-family: Arial, Helvetica, sans-serif; }
+#stats        { border: 2px solid black; }
+#controls     { width: 28em; float: left; padding: 1em; font-size: 0.7em; }
+#controls th  { text-align: right; vertical-align: middle; }
+#instructions { clear: left; float: left; width: 17em; padding: 1em; border: 1px solid black; box-shadow: 0 0 5px black; }
+#racer        { position: relative; z-index: 0; width: 640px; height: 480px; margin-left: 20em; border: 2px solid black; }
+#canvas       { position: absolute; z-index: 0; width: 640px; height: 480px; z-index: 0; background-color: #72D7EE; }
+#mute         { background-position:   0px 0px; width: 32px; height: 32px; background: url(data:image/png;base64,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); display: inline-block; cursor: pointer; position: absolute; margin-left: 20em; }
+#mute.on      { background-position: -32px 0px; }
+
+/**************************************************/
+/* rudimentary heads up display (only used in v4) */
+/**************************************************/
+
+#hud                   { position: absolute; z-index: 1; width: 640px; padding: 5px 0; font-family: Verdana, Geneva, sans-serif; font-size: 0.8em; background-color: rgba(255,0,0,0.4); color: black; border-bottom: 2px solid black; box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; }
+#hud .hud              { background-color: rgba(255,255,255,0.6); padding: 5px; border: 1px solid black; margin: 0 5px; transition-property: background-color; transition-duration: 2s; -webkit-transition-property: background-color; -webkit-transition-duration: 2s; }
+#hud #speed            { float: right; }
+#hud #current_lap_time { float: left;  }
+#hud #last_lap_time    { float: left; display: none;  }
+#hud #fast_lap_time    { display: block; width: 12em;  margin: 0 auto; text-align: center; transition-property: background-color; transition-duration: 2s; -webkit-transition-property: background-color; -webkit-transition-duration: 2s; }
+#hud .value            { color: black; font-weight: bold; }
+#hud .fastest          { background-color: rgba(255,215,0,0.5); }
+

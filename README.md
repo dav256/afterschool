@@ -4,7 +4,7 @@
 
 ![last commit](https://img.shields.io/github/last-commit/dav256/afterschool?style=for-the-badge) ![repo size](https://img.shields.io/github/repo-size/dav256/afterschool?style=for-the-badge) ![GitHub stars](https://img.shields.io/github/stars/dav256/afterschool?style=for-the-badge&logo=github) ![HTML](https://img.shields.io/badge/HTML-E34F26?style=for-the-badge&logo=html5&logoColor=white) ![CSS](https://img.shields.io/badge/CSS-663399?style=for-the-badge&logo=css&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-> **Ready to play:** Nineteen games are included and playable, and more can be added as folders.
+> **Ready to play:** Twenty-three games are included and playable, and more can be added as folders.
 
 **Afterschool is a local games portal with a dark, minimal theme.**
 
@@ -31,6 +31,10 @@ It is designed to run locally: open the page, choose a game, or use the in-page 
 - **Connect Four** — Board · 2 players (see Credits)
 - **Battleship** — Board · vs computer (see Credits)
 - **Footballers** — Sports · original 8-bit football (see Credits)
+- **Hextris** — Puzzle · spinning block puzzler (see Credits)
+- **Racer** — Racing · pseudo-3D racer (see Credits)
+- **xx142-b2.exe** — Action · tiny first-person virus game (see Credits)
+- **Wordle Unlimited** — Puzzle · endless Wordle (see Credits)
 - **Snake** from patorjk/JavaScript-Snake — MIT License (`games/snake/LICENSE`)
 - **Pong** from jakesgordon/javascript-pong — MIT License (`games/pong/LICENSE`)
 - **Tetris** from jakesgordon/javascript-tetris — MIT License (`games/tetris/LICENSE`)
@@ -41,6 +45,10 @@ It is designed to run locally: open the page, choose a game, or use the in-page 
 - **Simon** from sergiss/simon — MIT License (`games/simon/LICENSE`)
 - **Tic-Tac-Toe** from Mostafa-Samir/Tic-Tac-Toe-AI — MIT License (`games/tic-tac-toe/LICENSE`)
 - **Asteroids** (Stroids) from sclausen/stroids — BSD 3-Clause License (`games/asteroids/LICENSE.md`)
+- **Hextris** from Hextris/hextris — GNU GPL v3 (`games/hextris/LICENSE.md`)
+- **Racer** from jakesgordon/javascript-racer — MIT License (`games/racer/LICENSE`)
+- **xx142-b2.exe** from bencoder/js13k-2019 — MIT License (`games/xx142/LICENSE`)
+- **Wordle Unlimited** adapted from the open-source Wordle clone by WebDevSimplified — MIT License (`games/wordle-unlimited/LICENSE`)
 
 ## Credits
 

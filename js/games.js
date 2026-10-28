@@ -18,5 +18,9 @@ const DEFAULT_GAMES = [
   { id:"checkers", name:"Checkers", category:"Board", path:"games/checkers/index.html", note:"Local · vs computer", icon:"⚫", color:"#ef4444" },
   { id:"connect-four", name:"Connect Four", category:"Board", path:"games/connect-four/index.html", note:"Local · 2 players", icon:"🟡", color:"#3b82f6" },
   { id:"battleship", name:"Battleship", category:"Board", popular:true, path:"games/battleship/index.html", note:"Local · vs computer", icon:"🚢", color:"#7dd3fc" },
-  { id:"footballers", name:"Footballers", category:"Sports", popular:true, path:"games/footballers/index.html", note:"Local · 8-bit football", icon:"🏈", color:"#f97316" },
+  { id:"footballers", name:"Footballers", category:"Sports", popular:true, path:"games/footballers/index.html", note:"Local · 8-bit football", icon:"🏈", color:"#f97316" },,
+  { id:"hextris", name:"Hextris", category:"Puzzle", path:"games/hextris/index.html", note:"Local", icon:"⬡", color:"#e879f9" },
+  { id:"racer", name:"Racer", category:"Racing", popular:true, path:"games/racer/index.html", note:"Local", icon:"🏎️", color:"#f43f5e" },
+  { id:"xx142", name:"xx142-b2.exe", category:"Action", path:"games/xx142/index.html", note:"Local", icon:"👾", color:"#c084fc" },
+  { id:"wordle-unlimited", name:"Wordle Unlimited", category:"Puzzle", path:"games/wordle-unlimited/index.html", note:"Local · endless words", icon:"♾️", color:"#84cc16" },
 ];
