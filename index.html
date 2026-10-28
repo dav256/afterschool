@@ -35,6 +35,7 @@
         </div>
         <div class="nav-group">
           <div class="nav-label">Tools</div>
+          <button class="nav-item" id="btn-chat">Chat</button>
           <button class="nav-item" id="btn-stats">Stats</button>
           <button class="nav-item" id="btn-settings">Settings</button>
           <button class="nav-item" id="btn-admin">Admin panel</button>
@@ -51,6 +52,7 @@
             <p class="tagline" id="tagline">Local games only. No external embeds.</p>
           </div>
           <div class="top-actions">
+            <button class="pill-btn" id="btn-login">Login</button>
             <button class="pill-btn" id="btn-hero-random">Surprise me</button>
             <button class="pill-btn" id="btn-quick-cloak">Quick cloak</button>
           </div>
@@ -189,6 +191,8 @@
         <div class="admin-tabs">
           <button class="admin-tab active" data-tab="games">Games</button>
           <button class="admin-tab" data-tab="add">Add game</button>
+          <button class="admin-tab" data-tab="tools">Tools</button>
+          <button class="admin-tab" data-tab="announce">Announce</button>
         </div>
         <div id="tab-games" class="admin-tab-content">
           <p class="muted" style="margin-bottom:10px">Drag to reorder. Remove deletes from the list only. Play counts are tracked on this device.</p>
@@ -211,7 +215,62 @@
           <label><input type="checkbox" id="add-popular" /> Popular</label>
           <button class="btn" id="add-save" style="margin-top:16px;width:100%">Add game</button>
         </div>
+        <div id="tab-tools" class="admin-tab-content" hidden>
+          <label>Change admin password</label>
+          <input type="password" id="admin-new-pass" placeholder="New password" />
+          <button class="btn" id="admin-change-pass" style="margin-top:8px;width:100%">Update password</button>
+          <label style="margin-top:16px">Export / Import games</label>
+          <div class="row" style="gap:8px;margin-top:6px">
+            <button class="btn btn-ghost" id="admin-export" style="flex:1">Export JSON</button>
+            <button class="btn btn-ghost" id="admin-import" style="flex:1">Import JSON</button>
+          </div>
+          <input type="file" id="admin-import-file" accept=".json" hidden />
+          <label style="margin-top:16px">Discord Server ID (for chat widget)</label>
+          <input type="text" id="admin-discord-id" placeholder="e.g. 123456789012345678" />
+          <button class="btn" id="admin-save-discord" style="margin-top:8px;width:100%">Save Discord ID</button>
+        </div>
+        <div id="tab-announce" class="admin-tab-content" hidden>
+          <label>Site announcement (shows at top for everyone)</label>
+          <input type="text" id="admin-announce-text" placeholder="e.g. New games added!" />
+          <button class="btn" id="admin-announce-save" style="margin-top:8px;width:100%">Post announcement</button>
+          <button class="btn btn-ghost" id="admin-announce-clear" style="margin-top:8px;width:100%">Clear announcement</button>
+        </div>
         <button class="btn btn-ghost" id="admin-logout" style="margin-top:20px;width:100%">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Discord Chat Widget -->
+  <div class="modal" id="chat-modal" hidden>
+    <div class="modal-card" style="max-width:420px">
+      <div class="modal-head">
+        <h3>Community Chat</h3>
+        <button class="modal-close" id="chat-close">×</button>
+      </div>
+      <p class="muted" style="margin-bottom:12px">Live Discord chat. Join the server to talk with everyone.</p>
+      <iframe src="https://discord.com/widget?id=YOUR_SERVER_ID&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="border-radius:10px;background:#1e1e1e"></iframe>
+      <p class="muted" style="margin-top:10px;font-size:0.8rem">Enable the Server Widget in Discord Server Settings → Widget, then set the Server ID in Admin → Tools.</p>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal" id="login-modal" hidden>
+    <div class="modal-card" style="max-width:380px">
+      <div class="modal-head">
+        <h3 id="login-title">Login</h3>
+        <button class="modal-close" id="login-close">×</button>
+      </div>
+      <div id="login-form">
+        <label>Username</label>
+        <input type="text" id="login-user" placeholder="Choose a username" autocomplete="off" />
+        <label style="margin-top:12px">Password</label>
+        <input type="password" id="login-pass" placeholder="Password" />
+        <button class="btn" id="login-submit" style="margin-top:16px;width:100%">Continue</button>
+        <p class="muted" style="margin-top:10px;font-size:0.8rem">Accounts are saved on this device for now. Real cloud login coming later.</p>
+      </div>
+      <div id="login-logged-in" hidden>
+        <p>Signed in as <strong id="login-current-user"></strong></p>
+        <button class="btn btn-ghost" id="login-logout" style="margin-top:12px;width:100%">Logout</button>
       </div>
     </div>
   </div>
