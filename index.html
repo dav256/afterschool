@@ -33,9 +33,9 @@
           <button class="nav-item" data-filter="Action">Action</button>
         </div>
         <div class="nav-group">
-          <div class="nav-label">Admin</div>
+          <div class="nav-label">Tools</div>
+          <button class="nav-item" id="btn-settings">Settings</button>
           <button class="nav-item" id="btn-admin">Admin panel</button>
-          <button class="nav-item" id="btn-cloak-nav">Tab cloak</button>
           <a class="nav-item" href="dmca.html" style="text-decoration:none;display:block">Copyright / DMCA</a>
         </div>
       </nav>
@@ -76,6 +76,65 @@
     </main>
   </div>
 
+  <!-- Public Settings (no password) -->
+  <div class="modal" id="settings-modal" hidden>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Settings</h3>
+        <button class="modal-close" id="settings-close">×</button>
+      </div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-settings-tab="cloak">Cloak</button>
+        <button class="admin-tab" data-settings-tab="style">Site</button>
+      </div>
+
+      <div id="settings-tab-cloak" class="admin-tab-content">
+        <label>Tab disguise</label>
+        <p class="muted" style="margin-bottom:10px">Changes this tab's title and icon so it looks like schoolwork. Applies instantly and sticks on this device.</p>
+        <div class="preset-grid" id="cloak-presets"></div>
+        <label style="margin-top:14px">Custom tab title</label>
+        <input type="text" id="cloak-title" placeholder="e.g. Essay draft - Google Docs" />
+        <label style="margin-top:12px"><input type="checkbox" id="cloak-auto" /> Auto-cloak when the site loads</label>
+        <label style="margin-top:16px">Panic key</label>
+        <p class="muted" style="margin-bottom:8px">Press it anytime to jump straight to a safe page.</p>
+        <div class="row">
+          <select id="cloak-panic-key" style="flex:1">
+            <option value="`">Backtick ( ` )</option>
+            <option value="p">P</option>
+            <option value="x">X</option>
+          </select>
+          <input type="text" id="cloak-panic-url" style="flex:2" value="https://classroom.google.com/" />
+        </div>
+        <label style="margin-top:16px">Stealth open</label>
+        <p class="muted" style="margin-bottom:8px">Opens the whole portal inside an about:blank tab, so the address bar and history stay clean.</p>
+        <button class="btn" id="btn-blank" style="width:100%">Open in about:blank</button>
+      </div>
+
+      <div id="settings-tab-style" class="admin-tab-content" hidden>
+        <label>Accent color</label>
+        <div class="swatches" id="style-swatches">
+          <button class="swatch" data-accent="#f5f5f5" style="background:#f5f5f5" title="Cloud"></button>
+          <button class="swatch" data-accent="#f7a8b8" style="background:#f7a8b8" title="Strawberry"></button>
+          <button class="swatch" data-accent="#ffc49b" style="background:#ffc49b" title="Tangerine"></button>
+          <button class="swatch" data-accent="#ffe28a" style="background:#ffe28a" title="Banana"></button>
+          <button class="swatch" data-accent="#c5f0a0" style="background:#c5f0a0" title="Lime"></button>
+          <button class="swatch" data-accent="#9fe8d0" style="background:#9fe8d0" title="Mint"></button>
+          <button class="swatch" data-accent="#a8c8f0" style="background:#a8c8f0" title="Blueberry"></button>
+          <button class="swatch" data-accent="#c3aef0" style="background:#c3aef0" title="Grape"></button>
+          <button class="swatch" data-accent="#f5a8d8" style="background:#f5a8d8" title="Bubblegum"></button>
+          <button class="swatch" data-accent="#b8c4ce" style="background:#b8c4ce" title="Slate"></button>
+        </div>
+        <label style="margin-top:14px">Custom accent</label>
+        <input type="color" id="style-accent" value="#f5f5f5" />
+        <label style="margin-top:12px">Site name</label>
+        <input type="text" id="style-name" value="afterschool" />
+        <label style="margin-top:12px">Tagline</label>
+        <input type="text" id="style-tagline" value="Local games only. No external embeds." />
+        <button class="btn" id="style-save" style="margin-top:16px;width:100%">Save style</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal" id="admin-modal" hidden>
     <div class="modal-card">
       <div class="modal-head">
@@ -92,8 +151,6 @@
         <div class="admin-tabs">
           <button class="admin-tab active" data-tab="games">Games</button>
           <button class="admin-tab" data-tab="add">Add game</button>
-          <button class="admin-tab" data-tab="style">Site</button>
-          <button class="admin-tab" data-tab="cloak">Cloak</button>
         </div>
         <div id="tab-games" class="admin-tab-content">
           <p class="muted" style="margin-bottom:10px">Drag to reorder. Remove deletes from the list only. Play counts are tracked on this device.</p>
@@ -115,57 +172,6 @@
           <input type="text" id="add-path" placeholder="games/retro-bowl/index.html" />
           <label><input type="checkbox" id="add-popular" /> Popular</label>
           <button class="btn" id="add-save" style="margin-top:16px;width:100%">Add game</button>
-        </div>
-        <div id="tab-style" class="admin-tab-content" hidden>
-          <label>Accent color</label>
-          <div class="swatches" id="style-swatches">
-            <button class="swatch" data-accent="#f5f5f5" style="background:#f5f5f5" title="Cloud"></button>
-            <button class="swatch" data-accent="#f7a8b8" style="background:#f7a8b8" title="Strawberry"></button>
-            <button class="swatch" data-accent="#ffc49b" style="background:#ffc49b" title="Tangerine"></button>
-            <button class="swatch" data-accent="#ffe28a" style="background:#ffe28a" title="Banana"></button>
-            <button class="swatch" data-accent="#c5f0a0" style="background:#c5f0a0" title="Lime"></button>
-            <button class="swatch" data-accent="#9fe8d0" style="background:#9fe8d0" title="Mint"></button>
-            <button class="swatch" data-accent="#a8c8f0" style="background:#a8c8f0" title="Blueberry"></button>
-            <button class="swatch" data-accent="#c3aef0" style="background:#c3aef0" title="Grape"></button>
-            <button class="swatch" data-accent="#f5a8d8" style="background:#f5a8d8" title="Bubblegum"></button>
-            <button class="swatch" data-accent="#b8c4ce" style="background:#b8c4ce" title="Slate"></button>
-          </div>
-          <label style="margin-top:14px">Custom accent</label>
-          <input type="color" id="style-accent" value="#f5f5f5" />
-          <label style="margin-top:12px">Site name</label>
-          <input type="text" id="style-name" value="afterschool" />
-          <label style="margin-top:12px">Tagline</label>
-          <input type="text" id="style-tagline" value="Local games only. No external embeds." />
-          <button class="btn" id="style-save" style="margin-top:16px;width:100%">Save style</button>
-          <label style="margin-top:20px">Library data</label>
-          <p class="muted" style="margin-bottom:10px">Back up your games list, favorites, cloak settings, and play counts — or wipe everything back to defaults.</p>
-          <div class="row">
-            <button class="btn btn-ghost" id="data-export" style="flex:1">Export</button>
-            <button class="btn btn-ghost" id="data-import-btn" style="flex:1">Import</button>
-            <button class="btn btn-ghost danger" id="data-reset" style="flex:1">Reset all</button>
-          </div>
-          <input type="file" id="data-import" accept="application/json" hidden />
-        </div>
-        <div id="tab-cloak" class="admin-tab-content" hidden>
-          <label>Tab disguise</label>
-          <p class="muted" style="margin-bottom:10px">Changes this tab's title and icon so it looks like schoolwork. Applies instantly and sticks on this device.</p>
-          <div class="preset-grid" id="cloak-presets"></div>
-          <label style="margin-top:14px">Custom tab title</label>
-          <input type="text" id="cloak-title" placeholder="e.g. Essay draft - Google Docs" />
-          <label style="margin-top:12px"><input type="checkbox" id="cloak-auto" /> Auto-cloak when the site loads</label>
-          <label style="margin-top:16px">Panic key</label>
-          <p class="muted" style="margin-bottom:8px">Press it anytime to jump straight to a safe page.</p>
-          <div class="row">
-            <select id="cloak-panic-key" style="flex:1">
-              <option value="`">Backtick ( ` )</option>
-              <option value="p">P</option>
-              <option value="x">X</option>
-            </select>
-            <input type="text" id="cloak-panic-url" style="flex:2" value="https://classroom.google.com/" />
-          </div>
-          <label style="margin-top:16px">Stealth open</label>
-          <p class="muted" style="margin-bottom:8px">Opens the whole portal inside an about:blank tab, so the address bar and history stay clean.</p>
-          <button class="btn" id="btn-blank" style="width:100%">Open in about:blank</button>
         </div>
         <button class="btn btn-ghost" id="admin-logout" style="margin-top:20px;width:100%">Logout</button>
       </div>
