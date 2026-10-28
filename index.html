@@ -127,6 +127,23 @@
         </div>
         <label style="margin-top:14px">Custom accent</label>
         <input type="color" id="style-accent" value="#f5f5f5" />
+
+        <label style="margin-top:16px">Background</label>
+        <p class="muted" style="margin-bottom:8px">Shown behind the whole site.</p>
+        <div class="row" style="margin-bottom:10px">
+          <button type="button" class="pill-btn" id="bg-none" style="flex:1">None</button>
+          <button type="button" class="pill-btn" id="bg-color" style="flex:1">Color</button>
+          <button type="button" class="pill-btn" id="bg-image" style="flex:1">Image</button>
+        </div>
+        <div id="bg-color-controls" hidden>
+          <label>Background color</label>
+          <input type="color" id="style-bg-color" value="#070707" />
+        </div>
+        <div id="bg-image-controls" hidden>
+          <label>Background image URL</label>
+          <input type="text" id="style-bg-image" placeholder="https://example.com/image.jpg" />
+        </div>
+
         <label style="margin-top:12px">Site name</label>
         <input type="text" id="style-name" value="afterschool" />
         <label style="margin-top:12px">Tagline</label>
