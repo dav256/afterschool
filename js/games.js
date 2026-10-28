@@ -1,6 +1,5 @@
 // ONLY games that have local files and actually play
 const DEFAULT_GAMES = [
-  { id:"retro-bowl", name:"Retro Bowl", category:"Sports", popular:true, path:"games/retro-bowl/index.html", note:"Local · saves progress", icon:"🏈", color:"#4ade80" },
   { id:"2048", name:"2048", category:"Puzzle", popular:true, path:"games/2048/index.html", note:"Local", icon:"🔢", color:"#fbbf24" },
   { id:"snake", name:"Snake", category:"Arcade", popular:true, path:"games/snake/index.html", note:"Local", icon:"🐍", color:"#a3e635" },
   { id:"tetris", name:"Tetris", category:"Puzzle", popular:true, path:"games/tetris/index.html", note:"Local", icon:"🧩", color:"#22d3ee" },
@@ -18,7 +17,7 @@ const DEFAULT_GAMES = [
   { id:"checkers", name:"Checkers", category:"Board", path:"games/checkers/index.html", note:"Local · vs computer", icon:"⚫", color:"#ef4444" },
   { id:"connect-four", name:"Connect Four", category:"Board", path:"games/connect-four/index.html", note:"Local · 2 players", icon:"🟡", color:"#3b82f6" },
   { id:"battleship", name:"Battleship", category:"Board", popular:true, path:"games/battleship/index.html", note:"Local · vs computer", icon:"🚢", color:"#7dd3fc" },
-  { id:"footballers", name:"Footballers", category:"Sports", popular:true, path:"games/footballers/index.html", note:"Local · 8-bit football", icon:"🏈", color:"#f97316" },,
+  { id:"footballers", name:"Footballers", category:"Sports", popular:true, path:"games/footballers/index.html", note:"Local · 8-bit football", icon:"🏈", color:"#f97316" },
   { id:"hextris", name:"Hextris", category:"Puzzle", path:"games/hextris/index.html", note:"Local", icon:"⬡", color:"#e879f9" },
   { id:"racer", name:"Racer", category:"Racing", popular:true, path:"games/racer/index.html", note:"Local", icon:"🏎️", color:"#f43f5e" },
   { id:"xx142", name:"xx142-b2.exe", category:"Action", path:"games/xx142/index.html", note:"Local", icon:"👾", color:"#c084fc" },
