@@ -147,7 +147,7 @@ function applyStyle() {
 
 function esc(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
-    "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;",
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
   }[c]));
 }
 
