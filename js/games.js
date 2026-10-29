@@ -41,4 +41,13 @@ const DEFAULT_GAMES = [
   { id:"typing-test", name:"Typing Speed Test", category:"Skill", path:"games/typing-test/index.html", note:"Local", icon:"⌨️", color:"#64748b" },
   { id:"sokoban", name:"Sokoban", category:"Puzzle", path:"games/sokoban/index.html", note:"Local", icon:"📦", color:"#f97316" },
   { id:"nonogram", name:"Nonogram", category:"Puzzle", path:"games/nonogram/index.html", note:"Local", icon:"⬛", color:"#1f2937" },
+  // Even more
+  { id:"fruit-slicer", name:"Fruit Slicer", category:"Casual", popular:true, path:"games/fruit-slicer/index.html", note:"Local", icon:"🍉", color:"#ef4444" },
+  { id:"higher-lower", name:"Higher or Lower", category:"Casual", path:"games/higher-lower/index.html", note:"Local", icon:"📈", color:"#f59e0b" },
+  { id:"reaction-time", name:"Reaction Time", category:"Skill", path:"games/reaction-time/index.html", note:"Local", icon:"⚡", color:"#fbbf24" },
+  { id:"dots-boxes", name:"Dots and Boxes", category:"Puzzle", path:"games/dots-boxes/index.html", note:"Local", icon:"✏️", color:"#8b5cf6" },
+  { id:"fifteen-puzzle", name:"Fifteen Puzzle", category:"Puzzle", path:"games/fifteen-puzzle/index.html", note:"Local", icon:"🔢", color:"#6366f1" },
+  { id:"number-memory", name:"Number Memory", category:"Skill", path:"games/number-memory/index.html", note:"Local", icon:"🧠", color:"#22c55e" },
+  { id:"road-hopper", name:"Road Hopper", category:"Arcade", path:"games/road-hopper/index.html", note:"Local", icon:"🚗", color:"#f97316" },
+  { id:"tower-defense", name:"Tower Defense", category:"Strategy", path:"games/tower-defense/index.html", note:"Local", icon:"🏰", color:"#10b981" },
 ];
