@@ -149,8 +149,11 @@ function updateClock() {
   const el = document.getElementById("float-clock");
   if (!el) return;
   const now = new Date();
-  const options = { timeZone: "America/Chicago", hour: "2-digit", minute: "2-digit", hour12: true };
-  el.textContent = now.toLocaleTimeString("en-US", options) + " CT";
+  const timeOptions = { timeZone: "America/Chicago", hour: "2-digit", minute: "2-digit", hour12: true };
+  const dateOptions = { timeZone: "America/Chicago", weekday: "short", month: "short", day: "numeric" };
+  const time = now.toLocaleTimeString("en-US", timeOptions);
+  const date = now.toLocaleDateString("en-US", dateOptions);
+  el.innerHTML = `<div style="font-size:0.75rem;opacity:0.8;margin-bottom:1px">${date}</div><div>${time} CT</div>`;
   el.style.display = "block";
 }
 setInterval(updateClock, 10000);
