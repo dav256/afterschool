@@ -50,4 +50,7 @@ const DEFAULT_GAMES = [
   { id:"number-memory", name:"Number Memory", category:"Skill", path:"games/number-memory/index.html", note:"Local", icon:"🧠", color:"#22c55e" },
   { id:"road-hopper", name:"Road Hopper", category:"Arcade", path:"games/road-hopper/index.html", note:"Local", icon:"🚗", color:"#f97316" },
   { id:"tower-defense", name:"Tower Defense", category:"Strategy", path:"games/tower-defense/index.html", note:"Local", icon:"🏰", color:"#10b981" },
+  // Newest additions
+  { id:"lane-racer", name:"Lane Racer", category:"Racing", path:"games/lane-racer/index.html", note:"Local", icon:"🏎️", color:"#3b82f6" },
+  { id:"simon-says", name:"Simon Says", category:"Casual", path:"games/simon-says/index.html", note:"Local", icon:"🎵", color:"#818cf8" },
 ];
