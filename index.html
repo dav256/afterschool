@@ -11,6 +11,12 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <!-- Cool features -->
+  <div id="float-clock" style="position:fixed;top:12px;right:12px;z-index:50;background:rgba(16,16,16,0.85);backdrop-filter:blur(8px);padding:6px 12px;border-radius:999px;font-size:0.85rem;font-weight:600;border:1px solid #222;display:none">00:00</div>
+  <div id="gotd-banner" style="display:none;margin:12px 0;padding:14px 18px;background:linear-gradient(135deg,#1a1a1a,#222);border-radius:14px;border:1px solid #333;cursor:pointer">
+    <span style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#888">Game of the day</span>
+    <div id="gotd-name" style="font-weight:700;font-size:1.1rem;margin-top:2px"></div>
+  </div>
   <canvas id="particle-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;display:none;"></canvas>
   <div class="app">
     <aside class="sidebar">
@@ -38,6 +44,7 @@
           <button class="nav-item" id="btn-chat">Chat</button>
           <button class="nav-item" id="btn-stats">Stats</button>
           <button class="nav-item" id="btn-settings">Settings</button>
+          <button class="nav-item" id="btn-shortcuts">Shortcuts</button>
           <button class="nav-item" id="btn-admin">Admin panel</button>
           <a class="nav-item" href="dmca.html" style="text-decoration:none;display:block">Copyright / DMCA</a>
         </div>
@@ -53,6 +60,8 @@
           </div>
           <div class="top-actions">
             <button class="pill-btn" id="btn-login">Login</button>
+            <button class="pill-btn" id="btn-music" title="Music">♫</button>
+            <button class="pill-btn" id="btn-fullscreen" title="Fullscreen">⛶</button>
             <button class="pill-btn" id="btn-hero-random">Surprise me</button>
             <button class="pill-btn" id="btn-quick-cloak">Quick cloak</button>
           </div>
@@ -131,6 +140,13 @@
         <label style="margin-top:14px">Custom accent</label>
         <input type="color" id="style-accent" value="#f5f5f5" />
 
+        <label style="margin-top:16px">Theme presets</label>
+        <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          <button type="button" class="pill-btn theme-preset" data-theme="default">Default</button>
+          <button type="button" class="pill-btn theme-preset" data-theme="cyber">Cyber</button>
+          <button type="button" class="pill-btn theme-preset" data-theme="retro">Retro</button>
+          <button type="button" class="pill-btn theme-preset" data-theme="ocean">Ocean</button>
+        </div>
         <label style="margin-top:16px">Background</label>
         <p class="muted" style="margin-bottom:8px">Particle effects and custom backgrounds. All saved on this device.</p>
         <div class="row" style="margin-bottom:10px;flex-wrap:wrap;gap:6px">
@@ -143,6 +159,9 @@
           <button type="button" class="pill-btn" id="bg-stars" style="flex:1;min-width:70px">Stars</button>
           <button type="button" class="pill-btn" id="bg-rain" style="flex:1;min-width:70px">Rain</button>
           <button type="button" class="pill-btn" id="bg-christmas" style="flex:1;min-width:70px">Christmas</button>
+          <button type="button" class="pill-btn" id="bg-bubbles" style="flex:1;min-width:70px">Bubbles</button>
+          <button type="button" class="pill-btn" id="bg-matrix" style="flex:1;min-width:70px">Matrix</button>
+          <button type="button" class="pill-btn" id="bg-sparks" style="flex:1;min-width:70px">Sparks</button>
         </div>
         <div id="bg-color-controls" hidden>
           <label>Background color</label>
@@ -312,6 +331,43 @@
       <div id="login-logged-in" hidden>
         <p>Signed in as <strong id="login-current-user"></strong></p>
         <button class="btn btn-ghost" id="login-logout" style="margin-top:12px;width:100%">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Music Player -->
+  <div class="modal" id="music-modal" hidden>
+    <div class="modal-card" style="max-width:360px">
+      <div class="modal-head">
+        <h3>Music</h3>
+        <button class="modal-close" id="music-close">×</button>
+      </div>
+      <p class="muted" style="margin-bottom:12px">Chill beats while you play. Volume saved locally.</p>
+      <select id="music-track" style="margin-bottom:10px">
+        <option value="">Off</option>
+        <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">Track 1</option>
+        <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">Track 2</option>
+        <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3">Track 3</option>
+      </select>
+      <input type="range" id="music-volume" min="0" max="100" value="40" style="width:100%" />
+      <p class="muted" style="margin-top:8px;font-size:0.75rem">Tip: Use free lofi streams later if you want.</p>
+    </div>
+  </div>
+
+  <!-- Shortcuts -->
+  <div class="modal" id="shortcuts-modal" hidden>
+    <div class="modal-card" style="max-width:340px">
+      <div class="modal-head">
+        <h3>Shortcuts</h3>
+        <button class="modal-close" id="shortcuts-close">×</button>
+      </div>
+      <div style="font-size:0.9rem;line-height:1.8">
+        <div><kbd>`</kbd> Panic / leave</div>
+        <div><kbd>/</kbd> Focus search</div>
+        <div><kbd>r</kbd> Random game</div>
+        <div><kbd>f</kbd> Fullscreen</div>
+        <div><kbd>m</kbd> Music</div>
+        <div><kbd>?</kbd> This menu</div>
       </div>
     </div>
   </div>
