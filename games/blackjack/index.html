@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Blackjack</title>
+<style>
+body { font-family: system-ui, sans-serif; background:#111; color:#eee; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; padding:20px; }
+h1 { margin:10px 0; }
+.hand { margin:15px 0; font-size:1.2rem; }
+.cards { font-size:1.5rem; letter-spacing:4px; }
+button { margin:5px; padding:10px 20px; font-size:1rem; background:#333; color:#fff; border:none; border-radius:8px; cursor:pointer; }
+button:disabled { opacity:0.5; }
+#status { font-size:1.3rem; margin:10px 0; min-height:1.5em; }
+</style>
+</head>
+<body>
+<h1>Blackjack</h1>
+<div class="hand">Dealer: <span id="dealer-cards" class="cards"></span> <span id="dealer-sum"></span></div>
+<div class="hand">You: <span id="player-cards" class="cards"></span> <span id="player-sum"></span></div>
+<div id="status"></div>
+<div>
+  <button id="hit">Hit</button>
+  <button id="stand">Stand</button>
+  <button id="new">New Game</button>
+</div>
+<script>
+const suits = ["♠","♥","♦","♣"];
+const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+let deck, player, dealer, gameOver;
+const dealerCards = document.getElementById("dealer-cards");
+const dealerSum = document.getElementById("dealer-sum");
+const playerCards = document.getElementById("player-cards");
+const playerSum = document.getElementById("player-sum");
+const statusEl = document.getElementById("status");
+const hitBtn = document.getElementById("hit");
+const standBtn = document.getElementById("stand");
+function createDeck() {
+  deck = [];
+  for (let s of suits) for (let r of ranks) deck.push({rank:r, suit:s, value: r==="A"?11 : isNaN(r)?10 : +r});
+  for (let i=deck.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
+}
+function draw() { return deck.pop(); }
+function sum(hand) {
+  let s = hand.reduce((a,c)=>a+c.value,0);
+  let aces = hand.filter(c=>c.rank==="A").length;
+  while (s>21 && aces>0) { s-=10; aces--; }
+  return s;
+}
+function render() {
+  playerCards.textContent = player.map(c=>c.rank+c.suit).join(" ");
+  playerSum.textContent = "(" + sum(player) + ")";
+  dealerCards.textContent = dealer.map((c,i)=> gameOver || i===0 ? c.rank+c.suit : "🂠").join(" ");
+  dealerSum.textContent = gameOver ? "(" + sum(dealer) + ")" : "";
+}
+function check() {
+  const ps = sum(player), ds = sum(dealer);
+  if (ps > 21) { statusEl.textContent = "Bust! You lose."; gameOver=true; }
+  else if (gameOver) {
+    if (ds > 21 || ps > ds) statusEl.textContent = "You win!";
+    else if (ps < ds) statusEl.textContent = "Dealer wins.";
+    else statusEl.textContent = "Push.";
+  }
+  if (gameOver) { hitBtn.disabled = standBtn.disabled = true; render(); }
+}
+function newGame() {
+  createDeck();
+  player = [draw(), draw()];
+  dealer = [draw(), draw()];
+  gameOver = false;
+  statusEl.textContent = "";
+  hitBtn.disabled = standBtn.disabled = false;
+  render();
+  if (sum(player)===21) { statusEl.textContent="Blackjack!"; gameOver=true; check(); }
+}
+hitBtn.onclick = () => { if(gameOver) return; player.push(draw()); render(); check(); };
+standBtn.onclick = () => {
+  if(gameOver) return;
+  gameOver = true;
+  while (sum(dealer) < 17) dealer.push(draw());
+  render();
+  check();
+};
+document.getElementById("new").onclick = newGame;
+newGame();
+</script>
+</body>
+</html>

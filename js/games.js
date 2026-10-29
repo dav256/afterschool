@@ -1,6 +1,5 @@
 // ONLY games that have local files and actually play
 const DEFAULT_GAMES = [
-  { id:"retro-bowl", name:"Retro Bowl", category:"Sports", popular:true, path:"games/retro-bowl/index.html", note:"Local · saves progress", icon:"🏈", color:"#4ade80" },
   { id:"2048", name:"2048", category:"Puzzle", popular:true, path:"games/2048/index.html", note:"Local", icon:"🔢", color:"#fbbf24" },
   { id:"snake", name:"Snake", category:"Arcade", popular:true, path:"games/snake/index.html", note:"Local", icon:"🐍", color:"#a3e635" },
   { id:"tetris", name:"Tetris", category:"Puzzle", popular:true, path:"games/tetris/index.html", note:"Local", icon:"🧩", color:"#22d3ee" },
@@ -23,13 +22,10 @@ const DEFAULT_GAMES = [
   { id:"racer", name:"Racer", category:"Racing", popular:true, path:"games/racer/index.html", note:"Local", icon:"🏎️", color:"#f43f5e" },
   { id:"xx142", name:"xx142-b2.exe", category:"Action", path:"games/xx142/index.html", note:"Local", icon:"👾", color:"#c084fc" },
   { id:"wordle-unlimited", name:"Wordle Unlimited", category:"Puzzle", path:"games/wordle-unlimited/index.html", note:"Local · endless words", icon:"♾️", color:"#84cc16" },
-  // New additions
+  // New self-contained games
   { id:"hangman", name:"Hangman", category:"Puzzle", path:"games/hangman/index.html", note:"Local", icon:"💊", color:"#f59e0b" },
-  { id:"solitaire", name:"Solitaire", category:"Casual", path:"games/solitaire/index.html", note:"Local", icon:"🃏", color:"#10b981" },
-  { id:"sudoku", name:"Sudoku", category:"Puzzle", path:"games/sudoku/index.html", note:"Local", icon:"🔢", color:"#6366f1" },
-  { id:"space-invaders", name:"Space Invaders", category:"Arcade", path:"games/space-invaders/index.html", note:"Local", icon:"👾", color:"#ef4444" },
-  { id:"pacman", name:"Pac-Man", category:"Arcade", popular:true, path:"games/pacman/index.html", note:"Local", icon:"👾", color:"#facc15" },
-  { id:"frogger", name:"Frogger", category:"Arcade", path:"games/frogger/index.html", note:"Local", icon:"🐸", color:"#22c55e" },
   { id:"whack-a-mole", name:"Whack-a-Mole", category:"Casual", path:"games/whack-a-mole/index.html", note:"Local", icon:"🐟", color:"#a855f7" },
   { id:"rock-paper-scissors", name:"Rock Paper Scissors", category:"Casual", path:"games/rock-paper-scissors/index.html", note:"Local", icon:"✊", color:"#f97316" },
+  { id:"blackjack", name:"Blackjack", category:"Casual", path:"games/blackjack/index.html", note:"Local", icon:"🃏", color:"#10b981" },
+  { id:"lights-out", name:"Lights Out", category:"Puzzle", path:"games/lights-out/index.html", note:"Local", icon:"💡", color:"#facc15" },
 ];

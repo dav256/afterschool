@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hangman</title>
+<style>
+body { font-family: system-ui, sans-serif; background:#111; color:#eee; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; padding:20px; }
+h1 { margin:10px 0; }
+#word { font-size:2rem; letter-spacing:8px; margin:20px 0; font-family:monospace; }
+#keyboard { display:flex; flex-wrap:wrap; gap:6px; max-width:400px; justify-content:center; }
+button { padding:8px 12px; font-size:1rem; background:#333; color:#fff; border:1px solid #555; border-radius:6px; cursor:pointer; }
+button:disabled { opacity:0.4; cursor:default; }
+button:hover:not(:disabled) { background:#444; }
+#status { margin:15px 0; font-size:1.2rem; }
+#lives { color:#f87171; }
+</style>
+</head>
+<body>
+<h1>Hangman</h1>
+<div id="word"></div>
+<div id="lives">Lives: 6</div>
+<div id="status"></div>
+<div id="keyboard"></div>
+<button id="reset" style="margin-top:20px;">New Game</button>
+<script>
+const words = ["apple","banana","cherry","dragon","elephant","forest","guitar","horizon","island","jungle","kangaroo","lemon","mountain","nebula","ocean","penguin","quartz","rainbow","satellite","tiger","umbrella","volcano","whisper","xenon","yellow","zebra","algorithm","browser","console","developer","function","github","html","javascript","keyboard","library","module","node","object","promise","query","react","script","template","variable","webpack","xml","yaml","zombie"];
+let word, guessed, wrong, lives;
+const wordEl = document.getElementById("word");
+const livesEl = document.getElementById("lives");
+const statusEl = document.getElementById("status");
+const keyboardEl = document.getElementById("keyboard");
+function init() {
+  word = words[Math.floor(Math.random()*words.length)].toUpperCase();
+  guessed = new Set();
+  wrong = 0;
+  lives = 6;
+  statusEl.textContent = "";
+  render();
+  buildKeyboard();
+}
+function render() {
+  wordEl.textContent = word.split("").map(l => guessed.has(l) ? l : "_").join(" ");
+  livesEl.textContent = "Lives: " + (lives - wrong);
+  if (word.split("").every(l => guessed.has(l))) {
+    statusEl.textContent = "You win!";
+    disableAll();
+  } else if (wrong >= lives) {
+    statusEl.textContent = "Game over! Word was " + word;
+    disableAll();
+  }
+}
+function buildKeyboard() {
+  keyboardEl.innerHTML = "";
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(letter => {
+    const btn = document.createElement("button");
+    btn.textContent = letter;
+    btn.onclick = () => guess(letter, btn);
+    keyboardEl.appendChild(btn);
+  });
+}
+function guess(letter, btn) {
+  if (guessed.has(letter) || wrong >= lives) return;
+  guessed.add(letter);
+  btn.disabled = true;
+  if (!word.includes(letter)) wrong++;
+  render();
+}
+function disableAll() {
+  [...keyboardEl.children].forEach(b => b.disabled = true);
+}
+document.getElementById("reset").onclick = init;
+init();
+</script>
+</body>
+</html>

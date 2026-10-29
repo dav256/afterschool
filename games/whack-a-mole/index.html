@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Whack-a-Mole</title>
+<style>
+body { font-family: system-ui, sans-serif; background:#111; color:#eee; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; padding:20px; }
+h1 { margin:10px 0; }
+#board { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:20px 0; }
+.hole { width:100px; height:100px; background:#222; border-radius:50%; position:relative; cursor:pointer; overflow:hidden; }
+.mole { width:80px; height:80px; background:#a855f7; border-radius:50%; position:absolute; bottom:-80px; left:10px; transition:bottom .1s; }
+.mole.up { bottom:10px; }
+#score { font-size:1.5rem; }
+button { margin-top:10px; padding:10px 20px; font-size:1rem; background:#333; color:#fff; border:none; border-radius:8px; cursor:pointer; }
+</style>
+</head>
+<body>
+<h1>Whack-a-Mole</h1>
+<div id="score">Score: 0</div>
+<div id="board"></div>
+<button id="start">Start</button>
+<script>
+const board = document.getElementById("board");
+const scoreEl = document.getElementById("score");
+let score = 0, timeUp = false, lastHole;
+for (let i=0; i<9; i++) {
+  const hole = document.createElement("div");
+  hole.className = "hole";
+  const mole = document.createElement("div");
+  mole.className = "mole";
+  hole.appendChild(mole);
+  hole.onclick = () => whack(mole);
+  board.appendChild(hole);
+}
+const holes = document.querySelectorAll(".hole");
+function randomTime(min, max) { return Math.round(Math.random() * (max - min) + min); }
+function randomHole() {
+  const idx = Math.floor(Math.random() * holes.length);
+  const hole = holes[idx];
+  if (hole === lastHole) return randomHole();
+  lastHole = hole;
+  return hole;
+}
+function peep() {
+  const time = randomTime(300, 1000);
+  const hole = randomHole();
+  const mole = hole.querySelector(".mole");
+  mole.classList.add("up");
+  setTimeout(() => {
+    mole.classList.remove("up");
+    if (!timeUp) peep();
+  }, time);
+}
+function whack(mole) {
+  if (!mole.classList.contains("up")) return;
+  score++;
+  scoreEl.textContent = "Score: " + score;
+  mole.classList.remove("up");
+}
+document.getElementById("start").onclick = () => {
+  score = 0;
+  scoreEl.textContent = "Score: 0";
+  timeUp = false;
+  peep();
+  setTimeout(() => timeUp = true, 15000);
+};
+</script>
+</body>
+</html>
