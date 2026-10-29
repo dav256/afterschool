@@ -147,6 +147,24 @@ code{font-size:0.85em;background:var(--surface-2);padding:2px 6px;border-radius:
 .preset:hover{background:var(--surface-2)}
 .preset.active{background:var(--accent);color:#0a0a0a;font-weight:600;border-color:var(--accent)}
 
+/* Theme presets */
+body.theme-cyber { --accent: #00ff9f; --bg: #0a0a12; }
+body.theme-retro { --accent: #ff6b35; --bg: #1a120b; }
+body.theme-ocean { --accent: #4ecdc4; --bg: #0a1628; }
+
+/* Floating clock polish */
+#float-clock { transition: opacity 0.2s; }
+#float-clock:hover { opacity: 0.7; }
+
+/* GOTD banner hover */
+#gotd-banner:hover { border-color: var(--accent); transform: translateY(-2px); transition: 0.2s; }
+
+/* Music button active */
+#btn-music.active { background: var(--accent); color: #0a0a0a; }
+
+/* Shortcuts kbd */
+kbd { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #333; }
+
 /* ===== Responsive: Tablet ===== */
 @media (max-width: 1024px) {
   .app{grid-template-columns:200px 1fr}
