@@ -22,16 +22,23 @@ const DEFAULT_GAMES = [
   { id:"racer", name:"Racer", category:"Racing", popular:true, path:"games/racer/index.html", note:"Local", icon:"🏎️", color:"#f43f5e" },
   { id:"xx142", name:"xx142-b2.exe", category:"Action", path:"games/xx142/index.html", note:"Local", icon:"👾", color:"#c084fc" },
   { id:"wordle-unlimited", name:"Wordle Unlimited", category:"Puzzle", path:"games/wordle-unlimited/index.html", note:"Local · endless words", icon:"♾️", color:"#84cc16" },
-  // New self-contained games
   { id:"hangman", name:"Hangman", category:"Puzzle", path:"games/hangman/index.html", note:"Local", icon:"💊", color:"#f59e0b" },
   { id:"whack-a-mole", name:"Whack-a-Mole", category:"Casual", path:"games/whack-a-mole/index.html", note:"Local", icon:"🐟", color:"#a855f7" },
   { id:"rock-paper-scissors", name:"Rock Paper Scissors", category:"Casual", path:"games/rock-paper-scissors/index.html", note:"Local", icon:"✊", color:"#f97316" },
   { id:"blackjack", name:"Blackjack", category:"Casual", path:"games/blackjack/index.html", note:"Local", icon:"🃏", color:"#10b981" },
   { id:"lights-out", name:"Lights Out", category:"Puzzle", path:"games/lights-out/index.html", note:"Local", icon:"💡", color:"#facc15" },
-  // Added from open-source single-file collection
   { id:"solitaire", name:"Solitaire", category:"Casual", popular:true, path:"games/solitaire/index.html", note:"Local · Klondike", icon:"🃏", color:"#10b981" },
   { id:"sudoku", name:"Sudoku", category:"Puzzle", popular:true, path:"games/sudoku/index.html", note:"Local · Easy/Medium/Hard", icon:"🔢", color:"#6366f1" },
   { id:"space-invaders", name:"Space Invaders", category:"Arcade", popular:true, path:"games/space-invaders/index.html", note:"Local", icon:"👾", color:"#ef4444" },
   { id:"pacman", name:"Maze Chomper", category:"Arcade", popular:true, path:"games/pacman/index.html", note:"Local · maze eater", icon:"🟡", color:"#facc15" },
   { id:"frogger", name:"Frogger", category:"Arcade", path:"games/frogger/index.html", note:"Local", icon:"🐸", color:"#22c55e" },
+  // Additional single-file games
+  { id:"aim-trainer", name:"Aim Trainer", category:"Skill", path:"games/aim-trainer/index.html", note:"Local", icon:"🎯", color:"#ef4444" },
+  { id:"air-hockey", name:"Air Hockey", category:"Arcade", path:"games/air-hockey/index.html", note:"Local", icon:"🏒", color:"#3b82f6" },
+  { id:"doodle-jump", name:"Doodle Jump", category:"Arcade", popular:true, path:"games/doodle-jump/index.html", note:"Local", icon:"🟢", color:"#22c55e" },
+  { id:"bubble-shooter", name:"Bubble Shooter", category:"Arcade", path:"games/bubble-shooter/index.html", note:"Local", icon:"🫧", color:"#a855f7" },
+  { id:"trivia", name:"Trivia Quiz", category:"Puzzle", path:"games/trivia/index.html", note:"Local", icon:"💡", color:"#f59e0b" },
+  { id:"typing-test", name:"Typing Speed Test", category:"Skill", path:"games/typing-test/index.html", note:"Local", icon:"⌨️", color:"#64748b" },
+  { id:"sokoban", name:"Sokoban", category:"Puzzle", path:"games/sokoban/index.html", note:"Local", icon:"📦", color:"#f97316" },
+  { id:"nonogram", name:"Nonogram", category:"Puzzle", path:"games/nonogram/index.html", note:"Local", icon:"⬛", color:"#1f2937" },
 ];
