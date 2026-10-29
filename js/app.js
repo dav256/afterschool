@@ -143,11 +143,71 @@ function applyStyle() {
   });
 }
 
+/* ---------- cool features ---------- */
+
+function updateClock() {
+  const el = document.getElementById("float-clock");
+  if (!el) return;
+  const now = new Date();
+  el.textContent = now.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
+  el.style.display = "block";
+}
+setInterval(updateClock, 10000);
+updateClock();
+
+function showGameOfTheDay() {
+  const banner = document.getElementById("gotd-banner");
+  const nameEl = document.getElementById("gotd-name");
+  if (!banner || !games.length) return;
+  const day = Math.floor(Date.now() / 86400000);
+  const g = games[day % games.length];
+  nameEl.textContent = g.name;
+  banner.style.display = "block";
+  banner.onclick = () => { recordPlay(g); location.href = g.path; };
+}
+
+let musicAudio = null;
+function setupMusic() {
+  const track = document.getElementById("music-track");
+  const vol = document.getElementById("music-volume");
+  if (!track) return;
+  const saved = loadJSON("afterschool:music", {});
+  if (saved.url) track.value = saved.url;
+  if (saved.volume != null) vol.value = saved.volume;
+
+  function play() {
+    if (musicAudio) { musicAudio.pause(); musicAudio = null; }
+    const url = track.value;
+    if (!url) return;
+    musicAudio = new Audio(url);
+    musicAudio.loop = true;
+    musicAudio.volume = (vol.value || 40) / 100;
+    musicAudio.play().catch(() => {});
+    saveJSON("afterschool:music", { url, volume: +vol.value });
+  }
+  track.addEventListener("change", play);
+  vol.addEventListener("input", () => {
+    if (musicAudio) musicAudio.volume = vol.value / 100;
+    const cur = loadJSON("afterschool:music", {});
+    cur.volume = +vol.value;
+    saveJSON("afterschool:music", cur);
+  });
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+  else document.exitFullscreen();
+}
+
+function openShortcuts() {
+  document.getElementById("shortcuts-modal").hidden = false;
+}
+
 /* ---------- browsing: segments + chips ---------- */
 
 function esc(s) {
   return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;",
   }[c]));
 }
 
@@ -372,6 +432,51 @@ function openAdmin(tab) {
 /* ---------- init ---------- */
 
 function init() {
+  // Cool features
+  showGameOfTheDay();
+  setupMusic();
+
+  document.getElementById("btn-music")?.addEventListener("click", () => {
+    document.getElementById("music-modal").hidden = false;
+  });
+  document.getElementById("music-close")?.addEventListener("click", () => {
+    document.getElementById("music-modal").hidden = true;
+  });
+  document.getElementById("music-modal")?.addEventListener("click", (e) => {
+    if (e.target.id === "music-modal") document.getElementById("music-modal").hidden = true;
+  });
+
+  document.getElementById("btn-fullscreen")?.addEventListener("click", toggleFullscreen);
+  document.getElementById("btn-shortcuts")?.addEventListener("click", openShortcuts);
+  document.getElementById("shortcuts-close")?.addEventListener("click", () => {
+    document.getElementById("shortcuts-modal").hidden = true;
+  });
+  document.getElementById("shortcuts-modal")?.addEventListener("click", (e) => {
+    if (e.target.id === "shortcuts-modal") document.getElementById("shortcuts-modal").hidden = true;
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
+    if (e.key === "/") { e.preventDefault(); document.getElementById("search")?.focus(); }
+    if (e.key === "r") playRandom();
+    if (e.key === "f") toggleFullscreen();
+    if (e.key === "m") document.getElementById("btn-music")?.click();
+    if (e.key === "?") openShortcuts();
+  });
+
+  // Theme presets
+  document.querySelectorAll(".theme-preset").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const theme = btn.getAttribute("data-theme");
+      document.body.className = theme === "default" ? "" : "theme-" + theme;
+      saveJSON("afterschool:theme", theme);
+    });
+  });
+  // Load saved theme
+  const savedTheme = loadJSON("afterschool:theme", "default");
+  if (savedTheme && savedTheme !== "default") document.body.className = "theme-" + savedTheme;
+
   applyStyle();
   const cloak = loadCloak();
   if (cloak.preset !== "none" || cloak.customTitle) applyCloak();
@@ -471,57 +576,62 @@ function init() {
       showTab(pendingTab || "games");
       pendingTab = null;
     } else {
-      document.getElementById("admin-pass").value = "";
-      document.getElementById("admin-pass").placeholder = "Wrong password — try again";
+      alert("Wrong password");
     }
+  });
+
+  document.getElementById("admin-logout").addEventListener("click", () => {
+    document.getElementById("admin-panel").hidden = true;
+    document.getElementById("admin-login").hidden = false;
+    document.getElementById("admin-pass").value = "";
   });
 
   document.querySelectorAll("#admin-panel .admin-tab").forEach((t) =>
     t.addEventListener("click", () => showTab(t.getAttribute("data-tab"))));
 
-  document.getElementById("add-save").addEventListener("click", () => {
-    const name = document.getElementById("add-name").value.trim();
-    if (!name) return;
-    const category = document.getElementById("add-category").value;
-    let path = document.getElementById("add-path").value.trim();
-    if (!path) path = "games/" + slug(name) + "/index.html";
-    games.push({
-      id: slug(name) + "-" + Date.now().toString(36),
-      name: name,
-      category: category,
-      popular: document.getElementById("add-popular").checked,
-      path: path,
-      note: "Local",
-      icon: "🎮",
-      color: "#2a2a2a",
-    });
+  document.getElementById("add-save")?.addEventListener("click", () => {
+    const name = document.getElementById("add-name")?.value.trim();
+    const category = document.getElementById("add-category")?.value;
+    const path = document.getElementById("add-path")?.value.trim();
+    const popular = document.getElementById("add-popular")?.checked;
+    if (!name || !path) { alert("Name and path are required"); return; }
+    const id = slug(name);
+    if (games.some((g) => g.id === id)) { alert("A game with that name already exists"); return; }
+    games.push({ id, name, category, path, popular, note: "Local", icon: "🎮", color: "#666" });
     saveGames();
+    render();
     document.getElementById("add-name").value = "";
     document.getElementById("add-path").value = "";
     document.getElementById("add-popular").checked = false;
+    alert("Game added!");
     showTab("games");
-    render();
   });
 
-  // style tab
-  document.querySelectorAll(".swatch").forEach((sw) => {
-    sw.addEventListener("click", () => {
-      document.getElementById("style-accent").value = sw.getAttribute("data-accent");
-      const s = loadStyle();
-      s.accent = sw.getAttribute("data-accent");
-      saveJSON(LS_STYLE, s);
-      applyStyle();
-    });
-  });
-  document.getElementById("style-save").addEventListener("click", () => {
+  // style save
+  document.getElementById("style-save")?.addEventListener("click", () => {
     const s = {
       accent: document.getElementById("style-accent").value,
-      name: document.getElementById("style-name").value.trim(),
-      tagline: document.getElementById("style-tagline").value.trim(),
+      name: document.getElementById("style-name").value.trim() || "afterschool",
+      tagline: document.getElementById("style-tagline").value.trim()
     };
     saveJSON(LS_STYLE, s);
     applyStyle();
+    alert("Style saved");
+  });
+
+  // swatch clicks
+  document.querySelectorAll(".swatch").forEach((sw) => {
+    sw.addEventListener("click", () => {
+      const color = sw.getAttribute("data-accent");
+      if (color) {
+        document.getElementById("style-accent").value = color;
+        const s = loadStyle();
+        s.accent = color;
+        saveJSON(LS_STYLE, s);
+        applyStyle();
+      }
+    });
   });
 }
 
-document.addEventListener("DOMContentLoaded", init);
+init();
