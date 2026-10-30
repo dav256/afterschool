@@ -33,10 +33,19 @@ const DEFAULT_GAMES = [
   { id:"space-invaders", name:"Space Invaders", category:"Arcade", popular:true, path:"games/space-invaders/index.html", note:"Local", icon:"👾", color:"#ef4444" },
   { id:"pacman", name:"Maze Chomper", category:"Arcade", popular:true, path:"games/pacman/index.html", note:"Local · maze eater", icon:"🟡", color:"#facc15" },
   { id:"frogger", name:"Frogger", category:"Arcade", path:"games/frogger/index.html", note:"Local", icon:"🐸", color:"#22c55e" },
-  // Additional single-file games
   { id:"aim-trainer", name:"Aim Trainer", category:"Skill", path:"games/aim-trainer/index.html", note:"Local", icon:"🎯", color:"#ef4444" },
   { id:"air-hockey", name:"Air Hockey", category:"Arcade", path:"games/air-hockey/index.html", note:"Local", icon:"🏒", color:"#3b82f6" },
-  // Even more
   { id:"fifteen-puzzle", name:"Fifteen Puzzle", category:"Puzzle", path:"games/fifteen-puzzle/index.html", note:"Local", icon:"🔢", color:"#6366f1" },
-  // Newest additions
+  // Additional open-source classics
+  { id:"sokoban", name:"Sokoban", category:"Puzzle", path:"games/sokoban/index.html", note:"Local", icon:"📦", color:"#f59e0b" },
+  { id:"nonogram", name:"Nonogram", category:"Puzzle", path:"games/nonogram/index.html", note:"Local", icon:"⬛", color:"#64748b" },
+  { id:"tower-defense", name:"Tower Defense", category:"Strategy", path:"games/tower-defense/index.html", note:"Local", icon:"🏰", color:"#8b5cf6" },
+  { id:"dots-and-boxes", name:"Dots and Boxes", category:"Casual", path:"games/dots-and-boxes/index.html", note:"Local", icon:"▢", color:"#06b6d4" },
+  { id:"reaction-time", name:"Reaction Time", category:"Skill", path:"games/reaction-time/index.html", note:"Local", icon:"⚡", color:"#eab308" },
+  { id:"higher-or-lower", name:"Higher or Lower", category:"Casual", path:"games/higher-or-lower/index.html", note:"Local", icon:"🔺", color:"#22c55e" },
+  { id:"fruit-slicer", name:"Fruit Slicer", category:"Casual", path:"games/fruit-slicer/index.html", note:"Local", icon:"🍎", color:"#ef4444" },
+  { id:"typing-test", name:"Typing Test", category:"Skill", path:"games/typing-test/index.html", note:"Local", icon:"⌨", color:"#6366f1" },
+  { id:"doodle-jump", name:"Doodle Jump", category:"Arcade", path:"games/doodle-jump/index.html", note:"Local", icon:"🦊", color:"#f97316" },
+  { id:"bubble-shooter", name:"Bubble Shooter", category:"Casual", path:"games/bubble-shooter/index.html", note:"Local", icon:"💧", color:"#3b82f6" },
+  { id:"trivia", name:"Trivia", category:"Puzzle", path:"games/trivia/index.html", note:"Local", icon:"❓", color:"#8b5cf6" }
 ];
