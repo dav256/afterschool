@@ -1,4 +1,4 @@
-// Afterschool portal — full restored version with Game Editor and Game Day mode
+// Afterschool portal — full restored version with Game Editor and expanded Game Day mode
 
 const LS_GAMES = "afterschool:games";
 const LS_STYLE = "afterschool:style";
@@ -9,11 +9,19 @@ const LS_RECENTS = "afterschool:recents";
 const LS_GAMEDAY = "afterschool:gameday";
 const ADMIN_PASSWORD = "afterschool";
 
+const GAME_DAY_PRESETS = [
+  { id: "rosepark", name: "Rose Park Middle (Titans)", message: "It's Game Day — Go Rose Park Titans!", color: "#1a3a6b" },
+  { id: "titans", name: "Tennessee Titans", message: "It's Game Day — Go Titans!", color: "#4b92db" },
+  { id: "grizzlies", name: "Memphis Grizzlies", message: "It's Game Day — Go Grizzlies!", color: "#5d76a9" },
+  { id: "volunteers", name: "Tennessee Volunteers", message: "It's Game Day — Go Vols!", color: "#ff8200" },
+  { id: "custom", name: "Custom", message: "It's Game Day!", color: "#6366f1" }
+];
+
 let games = loadGames();
 let favs = loadJSON(LS_FAVS, []);
 let plays = loadJSON(LS_PLAYS, {});
 let recents = loadJSON(LS_RECENTS, []);
-let gameDay = loadJSON(LS_GAMEDAY, { enabled: false, message: "It's Game Day — Go Rose Park Titans!", sportsOnly: false });
+let gameDay = loadJSON(LS_GAMEDAY, { enabled: false, preset: "rosepark", message: "It's Game Day — Go Rose Park Titans!", sportsOnly: false, logoUrl: "", score: "" });
 let segMode = "browse";
 let chip = "all";
 let query = "";
@@ -105,8 +113,13 @@ function updateGameDayBanner() {
   const banner = document.getElementById("game-day-banner");
   if (!banner) return;
   if (gameDay.enabled) {
+    const preset = GAME_DAY_PRESETS.find(p => p.id === gameDay.preset) || GAME_DAY_PRESETS[0];
+    const logo = gameDay.logoUrl ? `<img src="${gameDay.logoUrl}" alt="logo" style="height:28px;vertical-align:middle;margin:0 8px;border-radius:4px;">` : `<span style="display:inline-block;width:28px;height:28px;background:${preset.color};border-radius:4px;vertical-align:middle;margin:0 8px;"></span>`;
+    const score = gameDay.score ? `<span style="margin-left:12px;font-weight:700;">${gameDay.score}</span>` : "";
     banner.hidden = false;
-    banner.innerHTML = `<strong>${gameDay.message}</strong> <img src="https://via.placeholder.com/32" alt="Rose Park" style="height:24px;vertical-align:middle;margin-left:8px;">`;
+    banner.innerHTML = `<strong>${gameDay.message || preset.message}</strong> ${logo} ${score}`;
+    banner.style.background = preset.color + "22";
+    banner.style.borderColor = preset.color;
   } else {
     banner.hidden = true;
   }
@@ -143,7 +156,6 @@ function init() {
   document.getElementById("ge-save")?.addEventListener("click", saveGameEditor);
   document.getElementById("ge-cancel")?.addEventListener("click", () => document.getElementById("game-editor-modal").hidden = true);
 
-  // Game Day toggle (add to settings or admin as needed)
   const gdToggle = document.getElementById("game-day-toggle");
   if (gdToggle) {
     gdToggle.checked = gameDay.enabled;
@@ -160,6 +172,44 @@ function init() {
       gameDay.sportsOnly = gdSports.checked;
       saveGameDay();
       render();
+    });
+  }
+  const gdPreset = document.getElementById("game-day-preset");
+  if (gdPreset) {
+    gdPreset.value = gameDay.preset || "rosepark";
+    gdPreset.addEventListener("change", () => {
+      gameDay.preset = gdPreset.value;
+      const p = GAME_DAY_PRESETS.find(x => x.id === gameDay.preset);
+      if (p && !gameDay.message) gameDay.message = p.message;
+      saveGameDay();
+      render();
+    });
+  }
+  const gdMsg = document.getElementById("game-day-message");
+  if (gdMsg) {
+    gdMsg.value = gameDay.message || "";
+    gdMsg.addEventListener("input", () => {
+      gameDay.message = gdMsg.value;
+      saveGameDay();
+      updateGameDayBanner();
+    });
+  }
+  const gdScore = document.getElementById("game-day-score");
+  if (gdScore) {
+    gdScore.value = gameDay.score || "";
+    gdScore.addEventListener("input", () => {
+      gameDay.score = gdScore.value;
+      saveGameDay();
+      updateGameDayBanner();
+    });
+  }
+  const gdLogo = document.getElementById("game-day-logo");
+  if (gdLogo) {
+    gdLogo.value = gameDay.logoUrl || "";
+    gdLogo.addEventListener("input", () => {
+      gameDay.logoUrl = gdLogo.value;
+      saveGameDay();
+      updateGameDayBanner();
     });
   }
 
