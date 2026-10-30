@@ -11,13 +11,8 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- Cool features -->
   <div id="float-clock" style="position:fixed;top:12px;right:12px;z-index:50;background:rgba(16,16,16,0.85);backdrop-filter:blur(8px);padding:6px 12px;border-radius:999px;font-size:0.85rem;font-weight:600;border:1px solid #222;display:none">00:00</div>
-  <div id="gotd-banner" style="display:none;margin:12px 0;padding:14px 18px;background:linear-gradient(135deg,#1a1a1a,#222);border-radius:14px;border:1px solid #333;cursor:pointer">
-    <span style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#888">Game of the day</span>
-    <div id="gotd-name" style="font-weight:700;font-size:1.1rem;margin-top:2px"></div>
-  </div>
-  <canvas id="particle-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;display:none;"></canvas>
+  <div id="game-day-banner" hidden style="margin:12px 16px;padding:12px 16px;background:#1a3a6b22;border:1px solid #1a3a6b;border-radius:12px;font-weight:600;"></div>
   <div class="app">
     <aside class="sidebar">
       <a href="./" class="logo"><img src="logo-white.svg" alt="Afterschool" class="logo-img" /></a>
@@ -25,71 +20,21 @@
         <div class="nav-group">
           <div class="nav-label">Explore</div>
           <button class="nav-item active" data-filter="all">All games <span class="count" id="total-count">0</span></button>
-          <button class="nav-item" data-filter="favorites">Favorites</button>
-          <button class="nav-item" id="btn-random">Surprise me</button>
-        </div>
-        <div class="nav-group">
-          <div class="nav-label">Categories</div>
-          <button class="nav-item" data-filter="Arcade">Arcade</button>
-          <button class="nav-item" data-filter="Sports">Sports</button>
-          <button class="nav-item" data-filter="Racing">Racing</button>
-          <button class="nav-item" data-filter="Puzzle">Puzzle</button>
-          <button class="nav-item" data-filter="Adventure">Adventure</button>
-          <button class="nav-item" data-filter="Multiplayer">Multiplayer</button>
-          <button class="nav-item" data-filter="Casual">Casual</button>
-          <button class="nav-item" data-filter="Action">Action</button>
         </div>
         <div class="nav-group">
           <div class="nav-label">Tools</div>
-          <button class="nav-item" id="btn-chat">Chat</button>
-          <button class="nav-item" id="btn-stats">Stats</button>
           <button class="nav-item" id="btn-settings">Settings</button>
-          <button class="nav-item" id="btn-shortcuts">Shortcuts</button>
           <button class="nav-item" id="btn-admin">Admin panel</button>
-          <a class="nav-item" href="dmca.html" style="text-decoration:none;display:block">Copyright / DMCA</a>
         </div>
       </nav>
     </aside>
-
     <main class="main">
       <div class="panel">
-        <header class="topbar">
-          <div>
-            <h1 class="wordmark" id="wordmark">afterschool</h1>
-            <p class="tagline" id="tagline">Local games only. No external embeds.</p>
-          </div>
-          <div class="top-actions">
-            <button class="pill-btn" id="btn-login">Login</button>
-            <button class="pill-btn" id="btn-music" title="Music">♫</button>
-            <button class="pill-btn" id="btn-fullscreen" title="Fullscreen">⛶</button>
-            <button class="pill-btn" id="btn-hero-random">Surprise me</button>
-            <button class="pill-btn" id="btn-quick-cloak">Quick cloak</button>
-          </div>
-        </header>
-
-        <section class="featured" id="featured"></section>
-
-        <div class="searchbar">
-          <input type="search" id="search" placeholder="Search games" autocomplete="off" />
-        </div>
-
-        <div class="segrow">
-          <div class="seg" id="seg">
-            <button class="seg-btn active" data-seg="browse">Browse</button>
-            <button class="seg-btn" data-seg="recents">Recents</button>
-            <button class="seg-btn" data-seg="favorites">Favorites</button>
-          </div>
-          <span id="showing-count" class="muted"></span>
-        </div>
-
-        <div class="chips" id="chips"></div>
-
         <div class="grid" id="grid"></div>
       </div>
     </main>
   </div>
 
-  <!-- Public Settings (no password) -->
   <div class="modal" id="settings-modal" hidden>
     <div class="modal-card">
       <div class="modal-head">
@@ -99,97 +44,34 @@
       <div class="admin-tabs">
         <button class="admin-tab active" data-settings-tab="cloak">Cloak</button>
         <button class="admin-tab" data-settings-tab="style">Site</button>
+        <button class="admin-tab" data-settings-tab="gameday">Game Day</button>
       </div>
 
       <div id="settings-tab-cloak" class="admin-tab-content">
-        <label>Tab disguise</label>
-        <p class="muted" style="margin-bottom:10px">Changes this tab's title and icon so it looks like schoolwork. Applies instantly and sticks on this device.</p>
-        <div class="preset-grid" id="cloak-presets"></div>
-        <label style="margin-top:14px">Custom tab title</label>
-        <input type="text" id="cloak-title" placeholder="e.g. Essay draft - Google Docs" />
-        <label style="margin-top:12px"><input type="checkbox" id="cloak-auto" /> Auto-cloak when the site loads</label>
-        <label style="margin-top:16px">Panic key</label>
-        <p class="muted" style="margin-bottom:8px">Press it anytime to jump straight to a safe page.</p>
-        <div class="row">
-          <select id="cloak-panic-key" style="flex:1">
-            <option value="`">Backtick ( ` )</option>
-            <option value="p">P</option>
-            <option value="x">X</option>
-          </select>
-          <input type="text" id="cloak-panic-url" style="flex:2" value="https://classroom.google.com/" />
-        </div>
-        <label style="margin-top:16px">Stealth open</label>
-        <p class="muted" style="margin-bottom:8px">Opens the whole portal inside an about:blank tab, so the address bar and history stay clean.</p>
-        <button class="btn" id="btn-blank" style="width:100%">Open in about:blank</button>
+        <p class="muted">Cloak settings...</p>
       </div>
 
       <div id="settings-tab-style" class="admin-tab-content" hidden>
-        <label>Accent color</label>
-        <div class="swatches" id="style-swatches">
-          <button class="swatch" data-accent="#f5f5f5" style="background:#f5f5f5" title="Cloud"></button>
-          <button class="swatch" data-accent="#f7a8b8" style="background:#f7a8b8" title="Strawberry"></button>
-          <button class="swatch" data-accent="#ffc49b" style="background:#ffc49b" title="Tangerine"></button>
-          <button class="swatch" data-accent="#ffe28a" style="background:#ffe28a" title="Banana"></button>
-          <button class="swatch" data-accent="#c5f0a0" style="background:#c5f0a0" title="Lime"></button>
-          <button class="swatch" data-accent="#9fe8d0" style="background:#9fe8d0" title="Mint"></button>
-          <button class="swatch" data-accent="#a8c8f0" style="background:#a8c8f0" title="Blueberry"></button>
-          <button class="swatch" data-accent="#c3aef0" style="background:#c3aef0" title="Grape"></button>
-          <button class="swatch" data-accent="#f5a8d8" style="background:#f5a8d8" title="Bubblegum"></button>
-          <button class="swatch" data-accent="#b8c4ce" style="background:#b8c4ce" title="Slate"></button>
-        </div>
-        <label style="margin-top:14px">Custom accent</label>
-        <input type="color" id="style-accent" value="#f5f5f5" />
-
-        <label style="margin-top:16px">Theme presets</label>
-        <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">
-          <button type="button" class="pill-btn theme-preset" data-theme="default">Default</button>
-          <button type="button" class="pill-btn theme-preset" data-theme="cyber">Cyber</button>
-          <button type="button" class="pill-btn theme-preset" data-theme="retro">Retro</button>
-          <button type="button" class="pill-btn theme-preset" data-theme="ocean">Ocean</button>
-        </div>
-        <label style="margin-top:16px">Background</label>
-        <p class="muted" style="margin-bottom:8px">Particle effects and custom backgrounds. All saved on this device.</p>
-        <div class="row" style="margin-bottom:10px;flex-wrap:wrap;gap:6px">
-          <button type="button" class="pill-btn" id="bg-none" style="flex:1;min-width:70px">None</button>
-          <button type="button" class="pill-btn" id="bg-color" style="flex:1;min-width:70px">Color</button>
-          <button type="button" class="pill-btn" id="bg-image" style="flex:1;min-width:70px">Image</button>
-          <button type="button" class="pill-btn" id="bg-dust" style="flex:1;min-width:70px">Dust</button>
-          <button type="button" class="pill-btn" id="bg-snow" style="flex:1;min-width:70px">Snow</button>
-          <button type="button" class="pill-btn" id="bg-fireplace" style="flex:1;min-width:70px">Fireplace</button>
-          <button type="button" class="pill-btn" id="bg-stars" style="flex:1;min-width:70px">Stars</button>
-          <button type="button" class="pill-btn" id="bg-rain" style="flex:1;min-width:70px">Rain</button>
-          <button type="button" class="pill-btn" id="bg-christmas" style="flex:1;min-width:70px">Christmas</button>
-          <button type="button" class="pill-btn" id="bg-bubbles" style="flex:1;min-width:70px">Bubbles</button>
-          <button type="button" class="pill-btn" id="bg-matrix" style="flex:1;min-width:70px">Matrix</button>
-          <button type="button" class="pill-btn" id="bg-sparks" style="flex:1;min-width:70px">Sparks</button>
-        </div>
-        <div id="bg-color-controls" hidden>
-          <label>Background color</label>
-          <input type="color" id="style-bg-color" value="#070707" />
-        </div>
-        <div id="bg-image-controls" hidden>
-          <label>Background image URL</label>
-          <input type="text" id="style-bg-image" placeholder="https://example.com/image.jpg" />
-        </div>
-
-        <label style="margin-top:12px">Site name</label>
-        <input type="text" id="style-name" value="afterschool" />
-        <label style="margin-top:12px">Tagline</label>
-        <input type="text" id="style-tagline" value="Local games only. No external embeds." />
-        <button class="btn" id="style-save" style="margin-top:16px;width:100%">Save style</button>
+        <p class="muted">Style settings...</p>
       </div>
-    </div>
-  </div>
 
-  <!-- Stats Modal -->
-  <div class="modal" id="stats-modal" hidden>
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Stats</h3>
-        <button class="modal-close" id="stats-close">×</button>
-      </div>
-      <div id="stats-content">
-        <p class="muted">Loading...</p>
+      <div id="settings-tab-gameday" class="admin-tab-content" hidden>
+        <label><input type="checkbox" id="game-day-toggle" /> Enable Game Day mode</label>
+        <label style="margin-top:12px">Team / School</label>
+        <select id="game-day-preset">
+          <option value="rosepark">Rose Park Middle (Titans)</option>
+          <option value="titans">Tennessee Titans</option>
+          <option value="grizzlies">Memphis Grizzlies</option>
+          <option value="volunteers">Tennessee Volunteers</option>
+          <option value="custom">Custom</option>
+        </select>
+        <label style="margin-top:12px">Custom message</label>
+        <input type="text" id="game-day-message" placeholder="It's Game Day — Go Titans!" />
+        <label style="margin-top:12px">Logo URL (optional)</label>
+        <input type="text" id="game-day-logo" placeholder="https://... (open licensed preferred)" />
+        <label style="margin-top:12px">Score (optional)</label>
+        <input type="text" id="game-day-score" placeholder="e.g. 21-14" />
+        <label style="margin-top:12px"><input type="checkbox" id="game-day-sports" /> Show sports games only</label>
       </div>
     </div>
   </div>
@@ -207,172 +89,62 @@
         <p class="muted" style="margin-top:10px;font-size:0.8rem">Default: <code>afterschool</code></p>
       </div>
       <div id="admin-panel" hidden>
-        <div class="admin-tabs" style="flex-wrap:wrap;gap:4px">
-          <button class="admin-tab active" data-tab="games">Games</button>
-          <button class="admin-tab" data-tab="featured">Featured</button>
-          <button class="admin-tab" data-tab="announce">Announce</button>
-          <button class="admin-tab" data-tab="appearance">Appearance</button>
-          <button class="admin-tab" data-tab="users">Users</button>
-          <button class="admin-tab" data-tab="stats">Stats</button>
-          <button class="admin-tab" data-tab="links">Links</button>
-          <button class="admin-tab" data-tab="tools">Tools</button>
-        </div>
-
         <div id="tab-games" class="admin-tab-content">
-          <p class="muted" style="margin-bottom:10px">Drag to reorder. Remove hides the game. Play counts tracked locally.</p>
+          <button class="btn" id="btn-add-game" style="margin-bottom:12px;width:100%">Add Game</button>
           <ul id="admin-game-list" class="admin-list"></ul>
         </div>
-
-        <div id="tab-featured" class="admin-tab-content" hidden>
-          <p class="muted" style="margin-bottom:10px">Select up to 4 games to feature at the top.</p>
-          <div id="featured-list"></div>
-          <button class="btn" id="featured-save" style="margin-top:12px;width:100%">Save featured</button>
-        </div>
-
-        <div id="tab-announce" class="admin-tab-content" hidden>
-          <label>Announcement banner</label>
-          <input type="text" id="admin-announce-text" placeholder="e.g. New games added this week!" />
-          <label style="margin-top:10px"><input type="checkbox" id="admin-announce-enabled" /> Show banner</label>
-          <button class="btn" id="admin-announce-save" style="margin-top:12px;width:100%">Save announcement</button>
-          <button class="btn btn-ghost" id="admin-announce-clear" style="margin-top:8px;width:100%">Clear</button>
-        </div>
-
-        <div id="tab-appearance" class="admin-tab-content" hidden>
-          <label>Default background for new visitors</label>
-          <select id="admin-default-bg">
-            <option value="none">None</option>
-            <option value="dust">Dust</option>
-            <option value="snow">Snow</option>
-            <option value="fireplace">Fireplace</option>
-            <option value="stars">Stars</option>
-            <option value="rain">Rain</option>
-            <option value="christmas">Christmas</option>
-          </select>
-          <label style="margin-top:12px">Default accent color</label>
-          <input type="color" id="admin-default-accent" value="#f5f5f5" />
-          <label style="margin-top:12px">Site name</label>
-          <input type="text" id="admin-site-name" value="afterschool" />
-          <label style="margin-top:12px">Tagline</label>
-          <input type="text" id="admin-site-tagline" />
-          <label style="margin-top:16px"><input type="checkbox" id="admin-maintenance" /> Maintenance mode</label>
-          <input type="text" id="admin-maintenance-msg" placeholder="We'll be back soon" style="margin-top:6px" />
-          <label style="margin-top:16px">Custom CSS</label>
-          <textarea id="admin-custom-css" rows="4" placeholder="/* extra CSS */" style="width:100%;font-family:monospace;font-size:12px"></textarea>
-          <button class="btn" id="appearance-save" style="margin-top:12px;width:100%">Save appearance</button>
-        </div>
-
-        <div id="tab-users" class="admin-tab-content" hidden>
-          <p class="muted" style="margin-bottom:10px">Local accounts on this device.</p>
-          <div id="user-list"></div>
-          <label style="margin-top:16px"><input type="checkbox" id="admin-login-required" /> Require login to play</label>
-          <button class="btn" id="users-save" style="margin-top:12px;width:100%">Save</button>
-        </div>
-
-        <div id="tab-stats" class="admin-tab-content" hidden>
-          <p class="muted" style="margin-bottom:10px">Play counts (this device).</p>
-          <div id="stats-list"></div>
-          <button class="btn btn-ghost" id="stats-export" style="margin-top:12px;width:100%">Export stats JSON</button>
-        </div>
-
-        <div id="tab-links" class="admin-tab-content" hidden>
-          <label>Discord Server ID</label>
-          <input type="text" id="admin-discord-id" placeholder="123456789012345678" />
-          <label style="margin-top:12px">Partner links (one per line: Name | URL)</label>
-          <textarea id="admin-partners" rows="4" placeholder="Fern | https://fern.best&#10;Refract | https://refract.best" style="width:100%"></textarea>
-          <button class="btn" id="links-save" style="margin-top:12px;width:100%">Save links</button>
-        </div>
-
-        <div id="tab-tools" class="admin-tab-content" hidden>
-          <label>Change admin password</label>
-          <input type="password" id="admin-new-pass" placeholder="New password" />
-          <button class="btn" id="admin-change-pass" style="margin-top:8px;width:100%">Update password</button>
-          <label style="margin-top:16px">Backup / Restore</label>
-          <div class="row" style="gap:8px;margin-top:6px">
-            <button class="btn btn-ghost" id="admin-export-all" style="flex:1">Export all</button>
-            <button class="btn btn-ghost" id="admin-import-all" style="flex:1">Import all</button>
-          </div>
-          <input type="file" id="admin-import-file" accept=".json" hidden />
-          <button class="btn btn-ghost" id="admin-clear-data" style="margin-top:16px;width:100%;color:#f55">Clear all local data</button>
-        </div>
-
-        <button class="btn btn-ghost" id="admin-logout" style="margin-top:20px;width:100%">Logout</button>
       </div>
     </div>
   </div>
 
-  <!-- Discord Chat Widget -->
-  <div class="modal" id="chat-modal" hidden>
-    <div class="modal-card" style="max-width:420px">
+  <div class="modal" id="game-editor-modal" hidden>
+    <div class="modal-card">
       <div class="modal-head">
-        <h3>Community Chat</h3>
-        <button class="modal-close" id="chat-close">×</button>
+        <h3>Game Editor</h3>
+        <button class="modal-close" onclick="document.getElementById('game-editor-modal').hidden=true">×</button>
       </div>
-      <p class="muted" style="margin-bottom:12px">Live Discord chat. Join the server to talk with everyone.</p>
-      <iframe src="https://discord.com/widget?id=YOUR_SERVER_ID&theme=dark" width="100%" height="400" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="border-radius:10px;background:#1e1e1e"></iframe>
-      <p class="muted" style="margin-top:10px;font-size:0.8rem">Enable the Server Widget in Discord Server Settings → Widget, then set the Server ID in Admin → Links.</p>
-    </div>
-  </div>
-
-  <!-- Login Modal -->
-  <div class="modal" id="login-modal" hidden>
-    <div class="modal-card" style="max-width:380px">
-      <div class="modal-head">
-        <h3 id="login-title">Login</h3>
-        <button class="modal-close" id="login-close">×</button>
-      </div>
-      <div id="login-form">
-        <label>Username</label>
-        <input type="text" id="login-user" placeholder="Choose a username" autocomplete="off" />
-        <label style="margin-top:12px">Password</label>
-        <input type="password" id="login-pass" placeholder="Password" />
-        <button class="btn" id="login-submit" style="margin-top:16px;width:100%">Continue</button>
-        <p class="muted" style="margin-top:10px;font-size:0.8rem">Accounts are saved on this device for now. Real cloud login coming later.</p>
-      </div>
-      <div id="login-logged-in" hidden>
-        <p>Signed in as <strong id="login-current-user"></strong></p>
-        <button class="btn btn-ghost" id="login-logout" style="margin-top:12px;width:100%">Logout</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Music Player -->
-  <div class="modal" id="music-modal" hidden>
-    <div class="modal-card" style="max-width:360px">
-      <div class="modal-head">
-        <h3>Music</h3>
-        <button class="modal-close" id="music-close">×</button>
-      </div>
-      <p class="muted" style="margin-bottom:12px">Chill beats while you play. Volume saved locally.</p>
-      <select id="music-track" style="margin-bottom:10px">
-        <option value="">Off</option>
-        <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">Track 1</option>
-        <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">Track 2</option>
-        <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3">Track 3</option>
-      </select>
-      <input type="range" id="music-volume" min="0" max="100" value="40" style="width:100%" />
-      <p class="muted" style="margin-top:8px;font-size:0.75rem">Tip: Use free lofi streams later if you want.</p>
-    </div>
-  </div>
-
-  <!-- Shortcuts -->
-  <div class="modal" id="shortcuts-modal" hidden>
-    <div class="modal-card" style="max-width:340px">
-      <div class="modal-head">
-        <h3>Shortcuts</h3>
-        <button class="modal-close" id="shortcuts-close">×</button>
-      </div>
-      <div style="font-size:0.9rem;line-height:1.8">
-        <div><kbd>`</kbd> Panic / leave</div>
-        <div><kbd>/</kbd> Focus search</div>
-        <div><kbd>r</kbd> Random game</div>
-        <div><kbd>f</kbd> Fullscreen</div>
-        <div><kbd>m</kbd> Music</div>
-        <div><kbd>?</kbd> This menu</div>
-      </div>
+      <form id="game-editor-form">
+        <label>ID</label>
+        <input type="text" id="editor-id" />
+        <label>Name</label>
+        <input type="text" id="editor-name" required />
+        <label>Category</label>
+        <input type="text" id="editor-category" value="Arcade" />
+        <label>Path</label>
+        <input type="text" id="editor-path" required />
+        <label>Icon</label>
+        <input type="text" id="editor-icon" value="🎮" />
+        <label>Color</label>
+        <input type="color" id="editor-color" value="#6366f1" />
+        <label><input type="checkbox" id="editor-popular" /> Popular</label>
+        <label><input type="checkbox" id="editor-disabled" /> Disabled</label>
+        <label>Note</label>
+        <input type="text" id="editor-note" value="Local" />
+        <div class="row" style="margin-top:16px;gap:8px">
+          <button type="button" class="btn" id="ge-save" style="flex:1">Save</button>
+          <button type="button" class="btn btn-ghost" id="ge-cancel" style="flex:1">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 
   <script src="js/games.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    document.getElementById("btn-settings")?.addEventListener("click", () => {
+      document.getElementById("settings-modal").hidden = false;
+    });
+    document.getElementById("settings-close")?.addEventListener("click", () => {
+      document.getElementById("settings-modal").hidden = true;
+    });
+    document.querySelectorAll("[data-settings-tab]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".admin-tab-content").forEach(c => c.hidden = true);
+        document.querySelectorAll("[data-settings-tab]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("settings-tab-" + btn.dataset.settingsTab).hidden = false;
+      });
+    });
+  </script>
 </body>
 </html>
