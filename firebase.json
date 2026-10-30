@@ -1,0 +1,214 @@
+{
+  "hosting": [
+    {
+      "site": "afterschool-635ab",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        ".git/**",
+        ".github/**",
+        "**/node_modules/**",
+        "README*",
+        "**/.*"
+      ],
+      "headers": [
+        {
+          "source": "games/**/*.@(js|wasm|data|unityweb|png|jpg|jpeg|gif|webp|svg|mp3|ogg|wav|woff|woff2|ttf|json)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=604800"
+            }
+          ]
+        },
+        {
+          "source": "**/*.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "js/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "site": "afterschool-games-635ab",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        ".git/**",
+        ".github/**",
+        "**/node_modules/**",
+        "README*",
+        "**/.*"
+      ],
+      "headers": [
+        {
+          "source": "games/**/*.@(js|wasm|data|unityweb|png|jpg|jpeg|gif|webp|svg|mp3|ogg|wav|woff|woff2|ttf|json)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=604800"
+            }
+          ]
+        },
+        {
+          "source": "**/*.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "js/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "site": "afterschool-hub-635ab",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        ".git/**",
+        ".github/**",
+        "**/node_modules/**",
+        "README*",
+        "**/.*"
+      ],
+      "headers": [
+        {
+          "source": "games/**/*.@(js|wasm|data|unityweb|png|jpg|jpeg|gif|webp|svg|mp3|ogg|wav|woff|woff2|ttf|json)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=604800"
+            }
+          ]
+        },
+        {
+          "source": "**/*.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "js/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "site": "afterschool-play-635ab",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        ".git/**",
+        ".github/**",
+        "**/node_modules/**",
+        "README*",
+        "**/.*"
+      ],
+      "headers": [
+        {
+          "source": "games/**/*.@(js|wasm|data|unityweb|png|jpg|jpeg|gif|webp|svg|mp3|ogg|wav|woff|woff2|ttf|json)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=604800"
+            }
+          ]
+        },
+        {
+          "source": "**/*.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "js/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "site": "afterschool-portal-635ab",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        ".firebaserc",
+        ".git/**",
+        ".github/**",
+        "**/node_modules/**",
+        "README*",
+        "**/.*"
+      ],
+      "headers": [
+        {
+          "source": "games/**/*.@(js|wasm|data|unityweb|png|jpg|jpeg|gif|webp|svg|mp3|ogg|wav|woff|woff2|ttf|json)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=604800"
+            }
+          ]
+        },
+        {
+          "source": "**/*.html",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
+          "source": "js/**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
