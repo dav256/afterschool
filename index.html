@@ -9,10 +9,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .settings-section { margin-bottom: 20px; }
+    .settings-section label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+    .settings-section .hint { font-size: 0.8rem; color: #888; margin-bottom: 8px; }
+    .settings-input, .settings-select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #333; background: #111; color: #fff; font-size: 0.95rem; }
+    .settings-row { display: flex; gap: 10px; align-items: center; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #222; }
+    .toggle-row:last-child { border-bottom: none; }
+  </style>
 </head>
 <body>
   <div id="float-clock" style="position:fixed;top:12px;right:12px;z-index:50;background:rgba(16,16,16,0.85);backdrop-filter:blur(8px);padding:6px 12px;border-radius:999px;font-size:0.85rem;font-weight:600;border:1px solid #222;display:none">00:00</div>
-  <div id="game-day-banner" hidden style="margin:12px 16px;padding:12px 16px;background:#1a3a6b22;border:1px solid #1a3a6b;border-radius:12px;font-weight:600;"></div>
+  <div id="game-day-banner" hidden style="margin:12px 16px;padding:14px 18px;background:#1a3a6b22;border:1px solid #1a3a6b;border-radius:14px;font-weight:600;display:flex;align-items:center;gap:10px;"></div>
   <div class="app">
     <aside class="sidebar">
       <a href="./" class="logo"><img src="logo-white.svg" alt="Afterschool" class="logo-img" /></a>
@@ -36,42 +45,72 @@
   </div>
 
   <div class="modal" id="settings-modal" hidden>
-    <div class="modal-card">
+    <div class="modal-card" style="max-width:480px;">
       <div class="modal-head">
         <h3>Settings</h3>
         <button class="modal-close" id="settings-close">×</button>
       </div>
-      <div class="admin-tabs">
+      <div class="admin-tabs" style="margin-bottom:16px;">
         <button class="admin-tab active" data-settings-tab="cloak">Cloak</button>
         <button class="admin-tab" data-settings-tab="style">Site</button>
         <button class="admin-tab" data-settings-tab="gameday">Game Day</button>
       </div>
 
       <div id="settings-tab-cloak" class="admin-tab-content">
-        <p class="muted">Cloak settings...</p>
+        <div class="settings-section">
+          <label>Tab disguise</label>
+          <p class="hint">Changes this tab's title and icon so it looks like schoolwork.</p>
+          <input type="text" class="settings-input" id="cloak-title" placeholder="e.g. Essay draft - Google Docs" />
+        </div>
+        <div class="toggle-row">
+          <span>Auto-cloak on load</span>
+          <input type="checkbox" id="cloak-auto" />
+        </div>
       </div>
 
       <div id="settings-tab-style" class="admin-tab-content" hidden>
-        <p class="muted">Style settings...</p>
+        <div class="settings-section">
+          <label>Accent color</label>
+          <input type="color" id="style-accent" value="#f5f5f5" />
+        </div>
+        <div class="settings-section">
+          <label>Site name</label>
+          <input type="text" class="settings-input" id="style-name" value="afterschool" />
+        </div>
       </div>
 
       <div id="settings-tab-gameday" class="admin-tab-content" hidden>
-        <label><input type="checkbox" id="game-day-toggle" /> Enable Game Day mode</label>
-        <label style="margin-top:12px">Team / School</label>
-        <select id="game-day-preset">
-          <option value="rosepark">Rose Park Middle (Titans)</option>
-          <option value="titans">Tennessee Titans</option>
-          <option value="grizzlies">Memphis Grizzlies</option>
-          <option value="volunteers">Tennessee Volunteers</option>
-          <option value="custom">Custom</option>
-        </select>
-        <label style="margin-top:12px">Custom message</label>
-        <input type="text" id="game-day-message" placeholder="It's Game Day — Go Titans!" />
-        <label style="margin-top:12px">Logo URL (optional)</label>
-        <input type="text" id="game-day-logo" placeholder="https://... (open licensed preferred)" />
-        <label style="margin-top:12px">Score (optional)</label>
-        <input type="text" id="game-day-score" placeholder="e.g. 21-14" />
-        <label style="margin-top:12px"><input type="checkbox" id="game-day-sports" /> Show sports games only</label>
+        <div class="toggle-row">
+          <span>Enable Game Day mode</span>
+          <input type="checkbox" id="game-day-toggle" />
+        </div>
+        <div class="settings-section" style="margin-top:16px;">
+          <label>Team / School</label>
+          <select class="settings-select" id="game-day-preset">
+            <option value="rosepark">Rose Park Middle (Titans)</option>
+            <option value="titans">Tennessee Titans</option>
+            <option value="grizzlies">Memphis Grizzlies</option>
+            <option value="volunteers">Tennessee Volunteers</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="settings-section">
+          <label>Banner message</label>
+          <input type="text" class="settings-input" id="game-day-message" placeholder="It's Game Day — Go Titans!" />
+        </div>
+        <div class="settings-section">
+          <label>Logo URL</label>
+          <p class="hint">Optional. Prefer openly licensed images.</p>
+          <input type="text" class="settings-input" id="game-day-logo" placeholder="https://..." />
+        </div>
+        <div class="settings-section">
+          <label>Score</label>
+          <input type="text" class="settings-input" id="game-day-score" placeholder="e.g. 21-14" />
+        </div>
+        <div class="toggle-row">
+          <span>Show sports games only</span>
+          <input type="checkbox" id="game-day-sports" />
+        </div>
       </div>
     </div>
   </div>
@@ -84,7 +123,7 @@
       </div>
       <div id="admin-login">
         <p class="muted" style="margin-bottom:12px">Password required.</p>
-        <input type="password" id="admin-pass" placeholder="Password" />
+        <input type="password" id="admin-pass" class="settings-input" placeholder="Password" />
         <button class="btn" id="admin-login-btn" style="margin-top:12px;width:100%">Login</button>
         <p class="muted" style="margin-top:10px;font-size:0.8rem">Default: <code>afterschool</code></p>
       </div>
@@ -104,22 +143,42 @@
         <button class="modal-close" onclick="document.getElementById('game-editor-modal').hidden=true">×</button>
       </div>
       <form id="game-editor-form">
-        <label>ID</label>
-        <input type="text" id="editor-id" />
-        <label>Name</label>
-        <input type="text" id="editor-name" required />
-        <label>Category</label>
-        <input type="text" id="editor-category" value="Arcade" />
-        <label>Path</label>
-        <input type="text" id="editor-path" required />
-        <label>Icon</label>
-        <input type="text" id="editor-icon" value="🎮" />
-        <label>Color</label>
-        <input type="color" id="editor-color" value="#6366f1" />
-        <label><input type="checkbox" id="editor-popular" /> Popular</label>
-        <label><input type="checkbox" id="editor-disabled" /> Disabled</label>
-        <label>Note</label>
-        <input type="text" id="editor-note" value="Local" />
+        <div class="settings-section">
+          <label>ID</label>
+          <input type="text" class="settings-input" id="editor-id" />
+        </div>
+        <div class="settings-section">
+          <label>Name</label>
+          <input type="text" class="settings-input" id="editor-name" required />
+        </div>
+        <div class="settings-section">
+          <label>Category</label>
+          <input type="text" class="settings-input" id="editor-category" value="Arcade" />
+        </div>
+        <div class="settings-section">
+          <label>Path</label>
+          <input type="text" class="settings-input" id="editor-path" required />
+        </div>
+        <div class="settings-section">
+          <label>Icon</label>
+          <input type="text" class="settings-input" id="editor-icon" value="🎮" />
+        </div>
+        <div class="settings-section">
+          <label>Color</label>
+          <input type="color" id="editor-color" value="#6366f1" />
+        </div>
+        <div class="toggle-row">
+          <span>Popular</span>
+          <input type="checkbox" id="editor-popular" />
+        </div>
+        <div class="toggle-row">
+          <span>Disabled</span>
+          <input type="checkbox" id="editor-disabled" />
+        </div>
+        <div class="settings-section">
+          <label>Note</label>
+          <input type="text" class="settings-input" id="editor-note" value="Local" />
+        </div>
         <div class="row" style="margin-top:16px;gap:8px">
           <button type="button" class="btn" id="ge-save" style="flex:1">Save</button>
           <button type="button" class="btn btn-ghost" id="ge-cancel" style="flex:1">Cancel</button>
