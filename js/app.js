@@ -38,7 +38,12 @@ function loadGames() {
   if (Array.isArray(stored) && stored.length) {
     const ids = new Set(stored.map(g => g.id));
     const merged = stored.slice();
-    if (typeof DEFAULT_GAMES !== "undefined") DEFAULT_GAMES.forEach(g => { if (!ids.has(g.id)) merged.push(g); });
+    if (typeof DEFAULT_GAMES !== "undefined") {
+      const defaults = {};
+      DEFAULT_GAMES.forEach(g => { defaults[g.id] = g; if (!ids.has(g.id)) merged.push(g); });
+      // games saved before icon images existed: pick up the default image
+      merged.forEach(g => { if (!g.image && defaults[g.id] && defaults[g.id].image) g.image = defaults[g.id].image; });
+    }
     return merged;
   }
   return typeof DEFAULT_GAMES !== "undefined" ? DEFAULT_GAMES.slice() : [];
@@ -87,6 +92,7 @@ function saveGameEditor() {
     note: document.getElementById("editor-note").value || "Local",
     disabled: document.getElementById("editor-disabled").checked
   };
+  if (index !== "" && games[parseInt(index)] && games[parseInt(index)].image) game.image = games[parseInt(index)].image;
   if (!game.name || !game.path) { alert("Name and path required"); return; }
   if (index === "") games.push(game);
   else games[parseInt(index)] = game;
@@ -125,6 +131,14 @@ function updateGameDayBanner() {
   }
 }
 
+function escAttr(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;"); }
+function thumbInner(g) {
+  const icon = `<span class="icon"${g.image ? " hidden" : ""}>${g.icon||'🎮'}</span>`;
+  if (!g.image) return icon;
+  // real game art; if it fails to load, drop it and show the emoji instead
+  return `<img class="thumb-img" src="${escAttr(g.image)}" alt="${escAttr(g.name)}" loading="lazy" decoding="async" onerror="this.nextElementSibling.hidden=false;this.remove()">${icon}`;
+}
+
 function render() {
   const grid = document.getElementById("grid");
   if (!grid) return;
@@ -132,7 +146,7 @@ function render() {
   if (gameDay.enabled && gameDay.sportsOnly) {
     list = list.filter(g => (g.category || "").toLowerCase().includes("sport"));
   }
-  grid.innerHTML = list.map(g => `<a class="card" href="${g.path}"><div class="thumb" style="background:${g.color||'#2a2a2a'}"><span class="icon">${g.icon||'🎮'}</span></div><div class="card-title">${g.name}</div><div class="card-meta">${g.category}</div></a>`).join("") || '<div class="empty">No games</div>';
+  grid.innerHTML = list.map(g => `<a class="card" href="${g.path}"><div class="thumb" style="background:${g.color||'#2a2a2a'}">${thumbInner(g)}</div><div class="card-title">${g.name}</div><div class="card-meta">${g.category}</div></a>`).join("") || '<div class="empty">No games</div>';
   const total = document.getElementById("total-count");
   if (total) total.textContent = games.length;
   updateGameDayBanner();
