@@ -9,73 +9,91 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <style>
-    .settings-section { margin-bottom: 20px; }
-    .settings-section label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
-    .settings-section .hint { font-size: 0.8rem; color: #888; margin-bottom: 8px; }
-    .settings-input, .settings-select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #333; background: #111; color: #fff; font-size: 0.95rem; }
-    .settings-row { display: flex; gap: 10px; align-items: center; }
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #222; }
-    .toggle-row:last-child { border-bottom: none; }
-  </style>
 </head>
 <body>
-  <div id="float-clock" style="position:fixed;top:12px;right:12px;z-index:50;background:rgba(16,16,16,0.85);backdrop-filter:blur(8px);padding:6px 12px;border-radius:999px;font-size:0.85rem;font-weight:600;border:1px solid #222;display:none">00:00</div>
-  <div id="game-day-banner" hidden style="margin:12px 16px;padding:14px 18px;background:#1a3a6b22;border:1px solid #1a3a6b;border-radius:14px;font-weight:600;display:flex;align-items:center;gap:10px;"></div>
+  <div id="float-clock">00:00</div>
+  <div id="game-day-banner" hidden></div>
+
   <div class="app">
     <aside class="sidebar">
-      <a href="./" class="logo"><img src="logo-white.svg" alt="Afterschool" class="logo-img" /></a>
+      <a href="./" class="logo"><img src="logo-white.svg" alt="Afterschool" class="logo-img" onerror="this.style.display='none'" /><span class="logo-text">afterschool</span></a>
       <nav class="nav">
         <div class="nav-group">
           <div class="nav-label">Explore</div>
           <button class="nav-item active" data-filter="all">All games <span class="count" id="total-count">0</span></button>
+          <button class="nav-item" id="btn-surprise">🎲 Surprise me</button>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">You</div>
+          <div id="streak-badge" class="streak-badge" hidden>🔥 0 day streak</div>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Leaderboard</div>
+          <div id="leaderboard" class="leaderboard"></div>
         </div>
         <div class="nav-group">
           <div class="nav-label">Tools</div>
+          <button class="nav-item" id="btn-music" title="Ambient music">♫ Music</button>
           <button class="nav-item" id="btn-settings">Settings</button>
-          <button class="nav-item" id="btn-admin">Admin panel</button>
+          <button class="nav-item" id="btn-admin">Admin</button>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Suggest a game</div>
+          <div class="suggest-box">
+            <input type="text" id="suggest-input" class="settings-input" placeholder="Game name..." />
+            <button class="btn" id="suggest-btn" style="width:100%;margin-top:8px">Submit</button>
+            <p id="suggest-msg" class="muted" hidden style="margin-top:6px">Thanks! Submitted.</p>
+          </div>
         </div>
       </nav>
     </aside>
+
     <main class="main">
       <div class="panel">
+        <header class="topbar">
+          <div>
+            <h1 class="wordmark">afterschool</h1>
+            <p class="tagline">Local games. No external embeds.</p>
+          </div>
+        </header>
+
+        <div id="potd" class="potd" hidden></div>
+
+        <div class="searchbar">
+          <input type="search" id="search" placeholder="Search games..." autocomplete="off" />
+        </div>
+
+        <div class="chips" id="chips"></div>
+
         <div class="grid" id="grid"></div>
       </div>
     </main>
   </div>
 
+  <!-- Settings -->
   <div class="modal" id="settings-modal" hidden>
-    <div class="modal-card" style="max-width:480px;">
+    <div class="modal-card" style="max-width:480px">
       <div class="modal-head">
         <h3>Settings</h3>
         <button class="modal-close" id="settings-close">×</button>
       </div>
-      <div class="admin-tabs" style="margin-bottom:16px;">
-        <button class="admin-tab active" data-settings-tab="cloak">Cloak</button>
-        <button class="admin-tab" data-settings-tab="style">Site</button>
+      <div class="admin-tabs" style="margin-bottom:16px">
+        <button class="admin-tab active" data-settings-tab="style">Theme</button>
         <button class="admin-tab" data-settings-tab="gameday">Game Day</button>
+        <button class="admin-tab" data-settings-tab="cloak">Cloak</button>
       </div>
 
-      <div id="settings-tab-cloak" class="admin-tab-content">
+      <div id="settings-tab-style" class="admin-tab-content">
         <div class="settings-section">
-          <label>Tab disguise</label>
-          <p class="hint">Changes this tab's title and icon so it looks like schoolwork.</p>
-          <input type="text" class="settings-input" id="cloak-title" placeholder="e.g. Essay draft - Google Docs" />
-        </div>
-        <div class="toggle-row">
-          <span>Auto-cloak on load</span>
-          <input type="checkbox" id="cloak-auto" />
-        </div>
-      </div>
-
-      <div id="settings-tab-style" class="admin-tab-content" hidden>
-        <div class="settings-section">
-          <label>Accent color</label>
-          <input type="color" id="style-accent" value="#f5f5f5" />
-        </div>
-        <div class="settings-section">
-          <label>Site name</label>
-          <input type="text" class="settings-input" id="style-name" value="afterschool" />
+          <label>Theme</label>
+          <div class="theme-row">
+            <button class="pill-btn" data-theme="default">Default</button>
+            <button class="pill-btn" data-theme="cyber">Cyber</button>
+            <button class="pill-btn" data-theme="retro">Retro</button>
+            <button class="pill-btn" data-theme="ocean">Ocean</button>
+            <button class="pill-btn" data-theme="spirit">School Spirit</button>
+            <button class="pill-btn" data-theme="midnight">Midnight</button>
+          </div>
         </div>
       </div>
 
@@ -84,7 +102,7 @@
           <span>Enable Game Day mode</span>
           <input type="checkbox" id="game-day-toggle" />
         </div>
-        <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section" style="margin-top:16px">
           <label>Team / School</label>
           <select class="settings-select" id="game-day-preset">
             <option value="rosepark">Rose Park Middle (Titans)</option>
@@ -100,7 +118,6 @@
         </div>
         <div class="settings-section">
           <label>Logo URL</label>
-          <p class="hint">Optional. Prefer openly licensed images.</p>
           <input type="text" class="settings-input" id="game-day-logo" placeholder="https://..." />
         </div>
         <div class="settings-section">
@@ -112,9 +129,21 @@
           <input type="checkbox" id="game-day-sports" />
         </div>
       </div>
+
+      <div id="settings-tab-cloak" class="admin-tab-content" hidden>
+        <div class="settings-section">
+          <label>Tab title disguise</label>
+          <input type="text" class="settings-input" id="cloak-title" placeholder="e.g. Essay draft - Google Docs" />
+        </div>
+        <div class="toggle-row">
+          <span>Auto-cloak on load</span>
+          <input type="checkbox" id="cloak-auto" />
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Admin -->
   <div class="modal" id="admin-modal" hidden>
     <div class="modal-card" style="max-width:560px">
       <div class="modal-head">
@@ -128,14 +157,13 @@
         <p class="muted" style="margin-top:10px;font-size:0.8rem">Default: <code>afterschool</code></p>
       </div>
       <div id="admin-panel" hidden>
-        <div id="tab-games" class="admin-tab-content">
-          <button class="btn" id="btn-add-game" style="margin-bottom:12px;width:100%">Add Game</button>
-          <ul id="admin-game-list" class="admin-list"></ul>
-        </div>
+        <button class="btn" id="btn-add-game" style="margin-bottom:12px;width:100%">Add Game</button>
+        <ul id="admin-game-list" class="admin-list"></ul>
       </div>
     </div>
   </div>
 
+  <!-- Game Editor -->
   <div class="modal" id="game-editor-modal" hidden>
     <div class="modal-card">
       <div class="modal-head">
@@ -143,42 +171,15 @@
         <button class="modal-close" onclick="document.getElementById('game-editor-modal').hidden=true">×</button>
       </div>
       <form id="game-editor-form">
-        <div class="settings-section">
-          <label>ID</label>
-          <input type="text" class="settings-input" id="editor-id" />
-        </div>
-        <div class="settings-section">
-          <label>Name</label>
-          <input type="text" class="settings-input" id="editor-name" required />
-        </div>
-        <div class="settings-section">
-          <label>Category</label>
-          <input type="text" class="settings-input" id="editor-category" value="Arcade" />
-        </div>
-        <div class="settings-section">
-          <label>Path</label>
-          <input type="text" class="settings-input" id="editor-path" required />
-        </div>
-        <div class="settings-section">
-          <label>Icon</label>
-          <input type="text" class="settings-input" id="editor-icon" value="🎮" />
-        </div>
-        <div class="settings-section">
-          <label>Color</label>
-          <input type="color" id="editor-color" value="#6366f1" />
-        </div>
-        <div class="toggle-row">
-          <span>Popular</span>
-          <input type="checkbox" id="editor-popular" />
-        </div>
-        <div class="toggle-row">
-          <span>Disabled</span>
-          <input type="checkbox" id="editor-disabled" />
-        </div>
-        <div class="settings-section">
-          <label>Note</label>
-          <input type="text" class="settings-input" id="editor-note" value="Local" />
-        </div>
+        <div class="settings-section"><label>ID</label><input type="text" class="settings-input" id="editor-id" /></div>
+        <div class="settings-section"><label>Name</label><input type="text" class="settings-input" id="editor-name" required /></div>
+        <div class="settings-section"><label>Category</label><input type="text" class="settings-input" id="editor-category" value="Arcade" /></div>
+        <div class="settings-section"><label>Path</label><input type="text" class="settings-input" id="editor-path" required /></div>
+        <div class="settings-section"><label>Icon</label><input type="text" class="settings-input" id="editor-icon" value="🎮" /></div>
+        <div class="settings-section"><label>Color</label><input type="color" id="editor-color" value="#6366f1" /></div>
+        <div class="toggle-row"><span>Popular</span><input type="checkbox" id="editor-popular" /></div>
+        <div class="toggle-row"><span>Disabled</span><input type="checkbox" id="editor-disabled" /></div>
+        <div class="settings-section"><label>Note</label><input type="text" class="settings-input" id="editor-note" value="Local" /></div>
         <div class="row" style="margin-top:16px;gap:8px">
           <button type="button" class="btn" id="ge-save" style="flex:1">Save</button>
           <button type="button" class="btn btn-ghost" id="ge-cancel" style="flex:1">Cancel</button>
@@ -189,21 +190,5 @@
 
   <script src="js/games.js"></script>
   <script src="js/app.js"></script>
-  <script>
-    document.getElementById("btn-settings")?.addEventListener("click", () => {
-      document.getElementById("settings-modal").hidden = false;
-    });
-    document.getElementById("settings-close")?.addEventListener("click", () => {
-      document.getElementById("settings-modal").hidden = true;
-    });
-    document.querySelectorAll("[data-settings-tab]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".admin-tab-content").forEach(c => c.hidden = true);
-        document.querySelectorAll("[data-settings-tab]").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        document.getElementById("settings-tab-" + btn.dataset.settingsTab).hidden = false;
-      });
-    });
-  </script>
 </body>
 </html>
