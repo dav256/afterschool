@@ -122,7 +122,16 @@
         </div>
         <div class="settings-section">
           <label>Score</label>
-          <input type="text" class="settings-input" id="game-day-score" placeholder="e.g. 21-14" />
+          <input type="text" class="settings-input" id="game-day-score" placeholder="e.g. 21-14 or auto from ESPN" />
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">
+            <button type="button" class="btn" id="gd-fetch-score" style="flex:0 0 auto">Fetch live score</button>
+            <span id="gd-score-status" class="muted" style="font-size:0.8rem"></span>
+          </div>
+          <p class="hint" style="margin-top:6px">Works for Titans, Grizzlies, and Vols via ESPN. Rose Park / custom stay manual.</p>
+        </div>
+        <div class="toggle-row">
+          <span>Auto-refresh ESPN score (every 60s)</span>
+          <input type="checkbox" id="game-day-auto-score" checked />
         </div>
         <div class="toggle-row">
           <span>Show sports games only</span>

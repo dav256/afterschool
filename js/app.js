@@ -1,4 +1,4 @@
-// Afterschool portal — 100x cooler upgrade
+// Afterschool portal — 100x cooler upgrade + ESPN live scores
 const LS_GAMES = "afterschool:games";
 const LS_STYLE = "afterschool:style";
 const LS_CLOAK = "afterschool:cloak";
@@ -12,6 +12,13 @@ const LS_BADGES = "afterschool:badges";
 const LS_THEME = "afterschool:theme";
 const LS_SUGGEST = "afterschool:suggestions";
 const ADMIN_PASSWORD = "afterschool";
+
+// ESPN public scoreboard (no key). Maps presets → sport/league + team name match
+const ESPN_PRESETS = {
+  titans: { sport: "football", league: "nfl", team: "Titans", abbr: "TEN" },
+  grizzlies: { sport: "basketball", league: "nba", team: "Grizzlies", abbr: "MEM" },
+  volunteers: { sport: "football", league: "college-football", team: "Tennessee", abbr: "TENN" }
+};
 
 const GAME_DAY_PRESETS = [
   { id: "rosepark", name: "Rose Park Middle (Titans)", message: "It's Game Day — Go Rose Park Titans!", color: "#1a3a6b" },
@@ -37,12 +44,13 @@ let recents = loadJSON(LS_RECENTS, []);
 let scores = loadJSON(LS_SCORES, {});
 let badges = loadJSON(LS_BADGES, []);
 let suggestions = loadJSON(LS_SUGGEST, []);
-let gameDay = loadJSON(LS_GAMEDAY, { enabled: false, preset: "rosepark", message: "It's Game Day — Go Rose Park Titans!", sportsOnly: false, logoUrl: "", score: "" });
+let gameDay = loadJSON(LS_GAMEDAY, { enabled: false, preset: "rosepark", message: "It's Game Day — Go Rose Park Titans!", sportsOnly: false, logoUrl: "", score: "", autoScore: true });
 let streak = loadJSON(LS_STREAK, { count: 0, lastDate: "" });
 let currentTheme = localStorage.getItem(LS_THEME) || "default";
 let chip = "all";
 let query = "";
 let musicOn = false;
+let espnTimer = null;
 
 function loadJSON(key, fallback) {
   try { const v = JSON.parse(localStorage.getItem(key) || "null"); return v == null ? fallback : v; } catch (e) { return fallback; }
@@ -140,6 +148,73 @@ function thumbInner(g) {
   const icon = `<span class="icon"${g.image ? " hidden" : ""}>${g.icon||'🎮'}</span>`;
   if (!g.image) return icon;
   return `<img class="thumb-img" src="${escAttr(g.image)}" alt="${escAttr(g.name)}" loading="lazy" decoding="async" onerror="this.nextElementSibling.hidden=false;this.remove()">${icon}`;
+}
+// ——— ESPN live score ———
+async function fetchEspnScore(presetId) {
+  const cfg = ESPN_PRESETS[presetId];
+  if (!cfg) return null;
+  const url = `https://site.api.espn.com/apis/site/v2/sports/${cfg.sport}/${cfg.league}/scoreboard`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("ESPN " + res.status);
+    const data = await res.json();
+    const events = data.events || [];
+    // Prefer in-progress, then today's scheduled/final for this team
+    const match = events.find(ev => {
+      const comps = (ev.competitions && ev.competitions[0] && ev.competitions[0].competitors) || [];
+      return comps.some(c => {
+        const n = (c.team && (c.team.abbreviation || c.team.shortDisplayName || c.team.displayName || "")).toString();
+        return n.toUpperCase().includes(cfg.abbr) || n.toLowerCase().includes(cfg.team.toLowerCase());
+      });
+    });
+    if (!match) return { text: "No game today", status: "none" };
+    const comp = match.competitions[0];
+    const competitors = comp.competitors || [];
+    const home = competitors.find(c => c.homeAway === "home") || competitors[0];
+    const away = competitors.find(c => c.homeAway === "away") || competitors[1];
+    const homeScore = home && home.score != null ? home.score : "-";
+    const awayScore = away && away.score != null ? away.score : "-";
+    const homeAbbr = (home.team && (home.team.abbreviation || home.team.shortDisplayName)) || "HOME";
+    const awayAbbr = (away.team && (away.team.abbreviation || away.team.shortDisplayName)) || "AWAY";
+    const status = (match.status && match.status.type && match.status.type.shortDetail) || (match.status && match.status.type && match.status.type.description) || "";
+    const state = (match.status && match.status.type && match.status.type.state) || ""; // pre | in | post
+    const scoreLine = `${awayAbbr} ${awayScore} – ${homeScore} ${homeAbbr}`;
+    return { text: scoreLine, status: status, state: state };
+  } catch (e) {
+    console.warn("ESPN fetch failed", e);
+    return { text: "Score unavailable", status: "error" };
+  }
+}
+
+async function refreshEspnScore(showFeedback) {
+  const btn = document.getElementById("gd-fetch-score");
+  const statusEl = document.getElementById("gd-score-status");
+  if (!ESPN_PRESETS[gameDay.preset]) {
+    if (statusEl) statusEl.textContent = "Live scores only for Titans, Grizzlies, Vols";
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = "Fetching…"; }
+  if (statusEl) statusEl.textContent = "Loading…";
+  const result = await fetchEspnScore(gameDay.preset);
+  if (btn) { btn.disabled = false; btn.textContent = "Fetch live score"; }
+  if (result) {
+    gameDay.score = result.text + (result.status && result.status !== "none" ? " · " + result.status : "");
+    saveGameDay();
+    const scoreInput = document.getElementById("game-day-score");
+    if (scoreInput) scoreInput.value = gameDay.score;
+    updateGameDayBanner();
+    if (statusEl) statusEl.textContent = result.state === "in" ? "Live" : (result.state === "post" ? "Final" : (result.state === "pre" ? "Upcoming" : result.status || ""));
+  } else if (statusEl) statusEl.textContent = "Could not load";
+}
+
+function startEspnPolling() {
+  stopEspnPolling();
+  if (!gameDay.enabled || !gameDay.autoScore || !ESPN_PRESETS[gameDay.preset]) return;
+  refreshEspnScore(false);
+  espnTimer = setInterval(() => refreshEspnScore(false), 60000); // every 60s
+}
+function stopEspnPolling() {
+  if (espnTimer) { clearInterval(espnTimer); espnTimer = null; }
 }
 
 function updateGameDayBanner() {
@@ -260,6 +335,8 @@ function render() {
   renderStreak();
   renderLeaderboard();
   renderChips();
+  if (gameDay.enabled && gameDay.autoScore) startEspnPolling();
+  else stopEspnPolling();
 }
 
 function renderChips() {
@@ -398,7 +475,11 @@ function init() {
   const gdToggle = document.getElementById("game-day-toggle");
   if (gdToggle) {
     gdToggle.checked = gameDay.enabled;
-    gdToggle.addEventListener("change", () => { gameDay.enabled = gdToggle.checked; saveGameDay(); render(); });
+    gdToggle.addEventListener("change", () => {
+      gameDay.enabled = gdToggle.checked;
+      saveGameDay();
+      render();
+    });
   }
   const gdSports = document.getElementById("game-day-sports");
   if (gdSports) {
@@ -414,7 +495,9 @@ function init() {
       if (p) gameDay.message = p.message;
       const msgEl = document.getElementById("game-day-message");
       if (msgEl) msgEl.value = gameDay.message;
-      saveGameDay(); render();
+      saveGameDay();
+      render();
+      if (ESPN_PRESETS[gameDay.preset] && gameDay.autoScore) refreshEspnScore(false);
     });
   }
   const gdMsg = document.getElementById("game-day-message");
@@ -432,6 +515,17 @@ function init() {
     gdLogo.value = gameDay.logoUrl || "";
     gdLogo.addEventListener("input", () => { gameDay.logoUrl = gdLogo.value; saveGameDay(); updateGameDayBanner(); });
   }
+  const gdAuto = document.getElementById("game-day-auto-score");
+  if (gdAuto) {
+    gdAuto.checked = gameDay.autoScore !== false;
+    gdAuto.addEventListener("change", () => {
+      gameDay.autoScore = gdAuto.checked;
+      saveGameDay();
+      if (gameDay.autoScore) startEspnPolling();
+      else stopEspnPolling();
+    });
+  }
+  document.getElementById("gd-fetch-score")?.addEventListener("click", () => refreshEspnScore(true));
 
   // Themes
   document.querySelectorAll("[data-theme]").forEach(btn => {
@@ -448,11 +542,10 @@ function init() {
   // Suggestions
   document.getElementById("suggest-btn")?.addEventListener("click", submitSuggestion);
 
-  // Music toggle (ambient placeholder)
+  // Music toggle
   document.getElementById("btn-music")?.addEventListener("click", () => {
     musicOn = !musicOn;
     document.getElementById("btn-music").classList.toggle("active", musicOn);
-    // Ambient audio can be wired to a real file later
   });
 
   render();
