@@ -20,7 +20,7 @@
       <nav class="nav">
         <div class="nav-group">
           <div class="nav-label">Explore</div>
-          <button class="nav-item active" data-filter="all">All games <span class="count" id="total-count">0</span></button>
+          <button class="nav-item active">All games <span class="count" id="total-count">0</span></button>
           <button class="nav-item" id="btn-surprise">🎲 Surprise me</button>
         </div>
         <div class="nav-group">
@@ -33,7 +33,7 @@
         </div>
         <div class="nav-group">
           <div class="nav-label">Tools</div>
-          <button class="nav-item" id="btn-music" title="Ambient music">♫ Music</button>
+          <button class="nav-item" id="btn-music">♫ Music</button>
           <button class="nav-item" id="btn-settings">Settings</button>
           <button class="nav-item" id="btn-admin">Admin</button>
         </div>
@@ -56,21 +56,16 @@
             <p class="tagline">Local games. No external embeds.</p>
           </div>
         </header>
-
         <div id="potd" class="potd" hidden></div>
-
         <div class="searchbar">
           <input type="search" id="search" placeholder="Search games..." autocomplete="off" />
         </div>
-
         <div class="chips" id="chips"></div>
-
         <div class="grid" id="grid"></div>
       </div>
     </main>
   </div>
 
-  <!-- Settings -->
   <div class="modal" id="settings-modal" hidden>
     <div class="modal-card" style="max-width:480px">
       <div class="modal-head">
@@ -102,16 +97,39 @@
           <span>Enable Game Day mode</span>
           <input type="checkbox" id="game-day-toggle" />
         </div>
-        <div class="settings-section" style="margin-top:16px">
-          <label>Team / School</label>
-          <select class="settings-select" id="game-day-preset">
-            <option value="rosepark">Rose Park Middle (Titans)</option>
-            <option value="titans">Tennessee Titans</option>
-            <option value="grizzlies">Memphis Grizzlies</option>
-            <option value="volunteers">Tennessee Volunteers</option>
-            <option value="custom">Custom</option>
-          </select>
+
+        <div class="settings-section" style="margin-top:14px">
+          <label>Mode</label>
+          <div class="row" style="gap:16px;margin-top:6px">
+            <label style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="radio" name="gd-mode" id="gd-mode-pro" checked /> Pro / College</label>
+            <label style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="radio" name="gd-mode" id="gd-mode-school" /> School</label>
+          </div>
         </div>
+
+        <div id="gd-pro-fields">
+          <div class="settings-section">
+            <label>League</label>
+            <select class="settings-select" id="gd-league">
+              <option value="nfl">NFL</option>
+              <option value="nba">NBA</option>
+              <option value="cfb">College Football</option>
+            </select>
+          </div>
+          <div class="settings-section">
+            <label>Team</label>
+            <select class="settings-select" id="gd-team">
+              <option value="">Select league first…</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="gd-school-fields" hidden>
+          <div class="settings-section">
+            <label>School / team name</label>
+            <input type="text" class="settings-input" id="gd-school-name" placeholder="e.g. Rose Park Titans" />
+          </div>
+        </div>
+
         <div class="settings-section">
           <label>Banner message</label>
           <input type="text" class="settings-input" id="game-day-message" placeholder="It's Game Day — Go Titans!" />
@@ -122,15 +140,15 @@
         </div>
         <div class="settings-section">
           <label>Score</label>
-          <input type="text" class="settings-input" id="game-day-score" placeholder="e.g. 21-14 or auto from ESPN" />
+          <input type="text" class="settings-input" id="game-day-score" placeholder="Auto from ESPN or type manually" />
           <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">
-            <button type="button" class="btn" id="gd-fetch-score" style="flex:0 0 auto">Fetch live score</button>
+            <button type="button" class="btn" id="gd-fetch-score">Fetch live score</button>
             <span id="gd-score-status" class="muted" style="font-size:0.8rem"></span>
           </div>
-          <p class="hint" style="margin-top:6px">Works for Titans, Grizzlies, and Vols via ESPN. Rose Park / custom stay manual.</p>
+          <p class="hint" style="margin-top:6px;font-size:0.8rem;color:#888">ESPN live scores for any NFL, NBA, or major college team. School mode is manual.</p>
         </div>
         <div class="toggle-row">
-          <span>Auto-refresh ESPN score (every 60s)</span>
+          <span>Auto-refresh ESPN score (60s)</span>
           <input type="checkbox" id="game-day-auto-score" checked />
         </div>
         <div class="toggle-row">
@@ -152,7 +170,6 @@
     </div>
   </div>
 
-  <!-- Admin -->
   <div class="modal" id="admin-modal" hidden>
     <div class="modal-card" style="max-width:560px">
       <div class="modal-head">
@@ -172,7 +189,6 @@
     </div>
   </div>
 
-  <!-- Game Editor -->
   <div class="modal" id="game-editor-modal" hidden>
     <div class="modal-card">
       <div class="modal-head">
