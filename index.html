@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Afterschool</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -10,51 +10,49 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
+<body class="fern-style">
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
   <div id="float-clock">00:00</div>
   <div id="game-day-banner" hidden></div>
 
   <div class="app">
-    <aside class="sidebar">
-      <a href="./" class="logo"><img src="logo-white.svg" alt="Afterschool" class="logo-img" onerror="this.style.display='none'" /><span class="logo-text">afterschool</span></a>
+    <aside class="sidebar" id="sidebar">
+      <a href="./" class="logo">
+        <img src="logo-white.svg" alt="Afterschool" class="logo-img" onerror="this.style.display='none'" />
+        <span class="logo-text">afterschool</span>
+      </a>
+      <div class="coins-pill" id="coins-pill">🪙 <span id="coins-count">0</span></div>
       <nav class="nav">
         <div class="nav-group">
           <div class="nav-label">Explore</div>
-          <button class="nav-item active">All games <span class="count" id="total-count">0</span></button>
+          <button class="nav-item active" data-filter="all">All games <span class="count" id="total-count">0</span></button>
+          <button class="nav-item" data-filter="popular">Popular</button>
+          <button class="nav-item" data-filter="Board" id="btn-playables">Playables</button>
           <button class="nav-item" id="btn-surprise">🎲 Surprise me</button>
         </div>
         <div class="nav-group">
           <div class="nav-label">You</div>
           <div id="streak-badge" class="streak-badge" hidden>🔥 0 day streak</div>
         </div>
-        <div class="nav-group">
+        <div class="nav-group desktop-only">
           <div class="nav-label">Leaderboard</div>
           <div id="leaderboard" class="leaderboard"></div>
         </div>
-        <div class="nav-group">
+        <div class="nav-group desktop-only">
           <div class="nav-label">Tools</div>
           <button class="nav-item" id="btn-music">♫ Music</button>
           <button class="nav-item" id="btn-settings">Settings</button>
           <button class="nav-item" id="btn-admin">Admin</button>
-        </div>
-        <div class="nav-group">
-          <div class="nav-label">Suggest a game</div>
-          <div class="suggest-box">
-            <input type="text" id="suggest-input" class="settings-input" placeholder="Game name..." />
-            <button class="btn" id="suggest-btn" style="width:100%;margin-top:8px">Submit</button>
-            <p id="suggest-msg" class="muted" hidden style="margin-top:6px">Thanks! Submitted.</p>
-          </div>
         </div>
       </nav>
     </aside>
 
     <main class="main">
       <div class="panel">
-        <header class="topbar">
+        <header class="topbar mobile-hide-title">
           <div>
             <h1 class="wordmark">afterschool</h1>
-            <p class="tagline">Local games. No external embeds.</p>
+            <p class="tagline">Local games · no external embeds</p>
           </div>
         </header>
         <div id="potd" class="potd" hidden></div>
@@ -67,6 +65,22 @@
     </main>
   </div>
 
+  <!-- Fern-style bottom nav (mobile) -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Main">
+    <button class="bn-item active" data-bn="games" title="Games">
+      <span class="bn-icon">🎮</span><span class="bn-label">Games</span>
+    </button>
+    <button class="bn-item" data-bn="playables" title="Playables">
+      <span class="bn-icon">♟</span><span class="bn-label">Playables</span>
+    </button>
+    <button class="bn-item" data-bn="music" title="Music" id="bn-music">
+      <span class="bn-icon">🎵</span><span class="bn-label">Music</span>
+    </button>
+    <button class="bn-item" data-bn="settings" title="Settings" id="bn-settings">
+      <span class="bn-icon">⚙️</span><span class="bn-label">Settings</span>
+    </button>
+  </nav>
+
   <div class="modal" id="settings-modal" hidden>
     <div class="modal-card" style="max-width:480px">
       <div class="modal-head">
@@ -78,7 +92,6 @@
         <button class="admin-tab" data-settings-tab="gameday">Game Day</button>
         <button class="admin-tab" data-settings-tab="cloak">Cloak</button>
       </div>
-
       <div id="settings-tab-style" class="admin-tab-content">
         <div class="settings-section">
           <label>Theme</label>
@@ -94,16 +107,14 @@
         <div class="settings-section">
           <label>Accent color</label>
           <div class="color-swatches" id="accent-swatches">
-            <button class="swatch" data-accent="#9fe8d0" style="background:#9fe8d0" title="Mint"></button>
-            <button class="swatch" data-accent="#00ff9f" style="background:#00ff9f" title="Neon"></button>
-            <button class="swatch" data-accent="#ff6b35" style="background:#ff6b35" title="Orange"></button>
-            <button class="swatch" data-accent="#4ecdc4" style="background:#4ecdc4" title="Teal"></button>
-            <button class="swatch" data-accent="#f5c542" style="background:#f5c542" title="Gold"></button>
-            <button class="swatch" data-accent="#a78bfa" style="background:#a78bfa" title="Purple"></button>
-            <button class="swatch" data-accent="#ef4444" style="background:#ef4444" title="Red"></button>
-            <button class="swatch" data-accent="#3b82f6" style="background:#3b82f6" title="Blue"></button>
-            <button class="swatch" data-accent="#ec4899" style="background:#ec4899" title="Pink"></button>
-            <button class="swatch" data-accent="#22c55e" style="background:#22c55e" title="Green"></button>
+            <button class="swatch" data-accent="#9fe8d0" style="background:#9fe8d0"></button>
+            <button class="swatch" data-accent="#00ff9f" style="background:#00ff9f"></button>
+            <button class="swatch" data-accent="#ff6b35" style="background:#ff6b35"></button>
+            <button class="swatch" data-accent="#4ecdc4" style="background:#4ecdc4"></button>
+            <button class="swatch" data-accent="#f5c542" style="background:#f5c542"></button>
+            <button class="swatch" data-accent="#a78bfa" style="background:#a78bfa"></button>
+            <button class="swatch" data-accent="#ef4444" style="background:#ef4444"></button>
+            <button class="swatch" data-accent="#3b82f6" style="background:#3b82f6"></button>
           </div>
         </div>
         <div class="settings-section">
@@ -112,36 +123,15 @@
             <button class="pill-btn" data-motion="none">None</button>
             <button class="pill-btn" data-motion="snow">Snow</button>
             <button class="pill-btn" data-motion="rain">Rain</button>
-            <button class="pill-btn" data-motion="stars">Starfield</button>
+            <button class="pill-btn active" data-motion="stars">Starfield</button>
           </div>
         </div>
-        <div class="settings-section">
-          <label>Animation speed</label>
-          <div class="theme-row" id="speed-row">
-            <button class="pill-btn" data-speed="low">Low</button>
-            <button class="pill-btn" data-speed="medium">Medium</button>
-            <button class="pill-btn" data-speed="fast">Fast</button>
-          </div>
-        </div>
-        <div class="toggle-row">
-          <span>Show floating clock</span>
-          <input type="checkbox" id="opt-show-clock" checked />
-        </div>
-        <div class="toggle-row">
-          <span>24-hour time</span>
-          <input type="checkbox" id="opt-24h" />
-        </div>
-        <div class="toggle-row">
-          <span>Reduce motion</span>
-          <input type="checkbox" id="opt-reduce-motion" />
-        </div>
+        <div class="toggle-row"><span>Show floating clock</span><input type="checkbox" id="opt-show-clock" checked /></div>
+        <div class="toggle-row"><span>24-hour time</span><input type="checkbox" id="opt-24h" /></div>
+        <div class="toggle-row"><span>Reduce motion</span><input type="checkbox" id="opt-reduce-motion" /></div>
       </div>
-
       <div id="settings-tab-gameday" class="admin-tab-content" hidden>
-        <div class="toggle-row">
-          <span>Enable Game Day mode</span>
-          <input type="checkbox" id="game-day-toggle" />
-        </div>
+        <div class="toggle-row"><span>Enable Game Day mode</span><input type="checkbox" id="game-day-toggle" /></div>
         <div class="settings-section" style="margin-top:14px">
           <label>Mode</label>
           <div class="row" style="gap:16px;margin-top:6px">
@@ -150,70 +140,46 @@
           </div>
         </div>
         <div id="gd-pro-fields">
-          <div class="settings-section">
-            <label>League</label>
-            <select class="settings-select" id="gd-league">
-              <option value="nfl">NFL</option>
-              <option value="nba">NBA</option>
-              <option value="cfb">College Football</option>
-            </select>
+          <div class="settings-section"><label>League</label>
+            <select class="settings-select" id="gd-league"><option value="nfl">NFL</option><option value="nba">NBA</option><option value="cfb">College Football</option></select>
           </div>
-          <div class="settings-section">
-            <label>Team</label>
+          <div class="settings-section"><label>Team</label>
             <select class="settings-select" id="gd-team"><option value="">Select league first…</option></select>
           </div>
         </div>
         <div id="gd-school-fields" hidden>
-          <div class="settings-section">
-            <label>School / team name</label>
+          <div class="settings-section"><label>School / team name</label>
             <input type="text" class="settings-input" id="gd-school-name" placeholder="e.g. Rose Park Titans" />
           </div>
         </div>
-        <div class="settings-section">
-          <label>Banner message</label>
+        <div class="settings-section"><label>Banner message</label>
           <input type="text" class="settings-input" id="game-day-message" placeholder="It's Game Day — Go Titans!" />
         </div>
-        <div class="settings-section">
-          <label>Logo URL</label>
+        <div class="settings-section"><label>Logo URL</label>
           <input type="text" class="settings-input" id="game-day-logo" placeholder="https://..." />
         </div>
-        <div class="settings-section">
-          <label>Score</label>
+        <div class="settings-section"><label>Score</label>
           <input type="text" class="settings-input" id="game-day-score" placeholder="Auto from ESPN or type manually" />
           <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap">
             <button type="button" class="btn" id="gd-fetch-score">Fetch live score</button>
             <span id="gd-score-status" class="muted" style="font-size:0.8rem"></span>
           </div>
         </div>
-        <div class="toggle-row">
-          <span>Auto-refresh ESPN score (60s)</span>
-          <input type="checkbox" id="game-day-auto-score" checked />
-        </div>
-        <div class="toggle-row">
-          <span>Show sports games only</span>
-          <input type="checkbox" id="game-day-sports" />
-        </div>
+        <div class="toggle-row"><span>Auto-refresh ESPN score (60s)</span><input type="checkbox" id="game-day-auto-score" checked /></div>
+        <div class="toggle-row"><span>Show sports games only</span><input type="checkbox" id="game-day-sports" /></div>
       </div>
-
       <div id="settings-tab-cloak" class="admin-tab-content" hidden>
-        <div class="settings-section">
-          <label>Tab title disguise</label>
+        <div class="settings-section"><label>Tab title disguise</label>
           <input type="text" class="settings-input" id="cloak-title" placeholder="e.g. Essay draft - Google Docs" />
         </div>
-        <div class="toggle-row">
-          <span>Auto-cloak on load</span>
-          <input type="checkbox" id="cloak-auto" />
-        </div>
+        <div class="toggle-row"><span>Auto-cloak on load</span><input type="checkbox" id="cloak-auto" /></div>
       </div>
     </div>
   </div>
 
   <div class="modal" id="admin-modal" hidden>
     <div class="modal-card" style="max-width:560px">
-      <div class="modal-head">
-        <h3>Admin</h3>
-        <button class="modal-close" id="admin-close">×</button>
-      </div>
+      <div class="modal-head"><h3>Admin</h3><button class="modal-close" id="admin-close">×</button></div>
       <div id="admin-login">
         <p class="muted" style="margin-bottom:12px">Password required.</p>
         <input type="password" id="admin-pass" class="settings-input" placeholder="Password" />
@@ -229,8 +195,7 @@
 
   <div class="modal" id="game-editor-modal" hidden>
     <div class="modal-card">
-      <div class="modal-head">
-        <h3>Game Editor</h3>
+      <div class="modal-head"><h3>Game Editor</h3>
         <button class="modal-close" onclick="document.getElementById('game-editor-modal').hidden=true">×</button>
       </div>
       <form id="game-editor-form">
@@ -254,5 +219,6 @@
   <script src="js/games.js"></script>
   <script src="js/app.js"></script>
   <script src="js/look.js"></script>
+  <script src="js/fern-ui.js"></script>
 </body>
 </html>
