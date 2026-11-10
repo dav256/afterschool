@@ -17,6 +17,7 @@ const DEFAULT_GAMES = [
   { id:"bit-life", name:"BitLife", category:"Casual", path:"games/bit-life/index.html", image:"images/icons/bit-life.webp", note:"Local", icon:"👤", color:"#8b5cf6" },
   { id:"blackjack", name:"Blackjack", category:"Casual", path:"games/blackjack/index.html", image:"images/icons/blackjack.webp", note:"Local", icon:"🂡", color:"#166534" },
   { id:"boxing-random", name:"Boxing Random", category:"Sports", path:"games/boxing-random/index.html", image:"images/icons/boxing-random.webp", note:"Local", icon:"🥊", color:"#b91c1c" },
+  { id:"breaklock", name:"Breaklock", category:"Puzzle", path:"games/breaklock/index.html", note:"Local", icon:"🔒", color:"#6366f1" },
   { id:"breakout", name:"Breakout", category:"Arcade", path:"games/breakout/index.html", image:"images/icons/breakout.webp", note:"Local", icon:"🧱", color:"#f97316" },
   { id:"bubble-pop", name:"Bubble Pop", category:"Arcade", path:"games/bubble-pop/index.html", note:"Local", icon:"🫧", color:"#06b6d4" },
   { id:"catch-fall", name:"Catch Fall", category:"Arcade", path:"games/catch-fall/index.html", note:"Local", icon:"🧺", color:"#22c55e" },
