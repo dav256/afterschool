@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Bubble Pop</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a12;color:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+h1{color:#9fe8d0;font-size:1.2rem;margin:8px}canvas{border-radius:12px;background:#0d1520;max-width:100%;touch-action:none}
+.hud{font-weight:700;margin:6px}.btn{margin-top:10px;padding:10px 20px;border:none;border-radius:999px;background:#9fe8d0;color:#0a0a0a;font-weight:700}
+</style></head><body>
+<h1>Bubble Pop</h1>
+<div class="hud" id="score">Score: 0</div>
+<canvas id="c" width="360" height="480"></canvas>
+<button class="btn" id="restart">Restart</button>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const colors=['#ef4444','#3b82f6','#22c55e','#eab308','#a855f7','#f97316'];
+let bubbles=[],score=0,spawn=0;
+function reset(){bubbles=[];score=0;document.getElementById('score').textContent='Score: 0';}
+document.getElementById('restart').onclick=reset;
+canvas.addEventListener('pointerdown',e=>{
+  const r=canvas.getBoundingClientRect();
+  const x=(e.clientX-r.left)*(canvas.width/r.width);
+  const y=(e.clientY-r.top)*(canvas.height/r.height);
+  for(let i=bubbles.length-1;i>=0;i--){
+    const b=bubbles[i];const dx=x-b.x,dy=y-b.y;
+    if(dx*dx+dy*dy<b.r*b.r){score+=Math.ceil(b.r/4);bubbles.splice(i,1);document.getElementById('score').textContent='Score: '+score;return;}
+  }
+});
+function tick(){
+  ctx.fillStyle='#0d1520';ctx.fillRect(0,0,360,480);
+  spawn++;
+  if(spawn%25===0)bubbles.push({x:30+Math.random()*300,y:500,r:14+Math.random()*22,vy:-(1.2+Math.random()*2),color:colors[Math.floor(Math.random()*colors.length)]});
+  bubbles.forEach(b=>{b.y+=b.vy;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fillStyle=b.color;ctx.globalAlpha=0.85;ctx.fill();ctx.globalAlpha=1;ctx.strokeStyle='#fff3';ctx.stroke();});
+  bubbles=bubbles.filter(b=>b.y+b.r>0);
+  requestAnimationFrame(tick);
+}
+reset();tick();
+</script></body></html>

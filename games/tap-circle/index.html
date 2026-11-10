@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Tap Circle</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a12;color:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+h1{color:#9fe8d0;font-size:1.2rem}canvas{background:#0d1117;border-radius:12px;max-width:100%;touch-action:none}.hud{font-weight:700;margin:8px}.btn{margin-top:10px;padding:10px 20px;border:none;border-radius:999px;background:#9fe8d0;color:#0a0a0a;font-weight:700}
+</style></head><body>
+<h1>Tap Circle</h1>
+<div class="hud" id="score">Score: 0 · Miss: 0</div>
+<canvas id="c" width="360" height="480"></canvas>
+<button class="btn" id="restart">Restart</button>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let target=null,score=0,miss=0,tNext=0;
+function place(){const r=28+Math.random()*18;target={x:r+Math.random()*(360-2*r),y:r+Math.random()*(480-2*r),r,born:performance.now(),life:1400-Math.min(800,score*15)};}
+function reset(){score=0;miss=0;place();document.getElementById('score').textContent='Score: 0 · Miss: 0';}
+document.getElementById('restart').onclick=reset;
+canvas.addEventListener('pointerdown',e=>{
+  if(!target)return;
+  const rect=canvas.getBoundingClientRect();
+  const x=(e.clientX-rect.left)*(canvas.width/rect.width);
+  const y=(e.clientY-rect.top)*(canvas.height/rect.height);
+  const dx=x-target.x,dy=y-target.y;
+  if(dx*dx+dy*dy<=target.r*target.r){score++;document.getElementById('score').textContent=`Score: ${score} · Miss: ${miss}`;place();}
+  else{miss++;document.getElementById('score').textContent=`Score: ${score} · Miss: ${miss}`;}
+});
+function tick(){
+  ctx.fillStyle='#0d1117';ctx.fillRect(0,0,360,480);
+  if(target){
+    const age=performance.now()-target.born;
+    if(age>target.life){miss++;document.getElementById('score').textContent=`Score: ${score} · Miss: ${miss}`;place();}
+    const t=1-age/target.life;
+    ctx.beginPath();ctx.arc(target.x,target.y,target.r,0,Math.PI*2);ctx.fillStyle=`rgba(159,232,208,${0.3+0.7*t})`;ctx.fill();
+    ctx.lineWidth=3;ctx.strokeStyle='#9fe8d0';ctx.stroke();
+  }
+  requestAnimationFrame(tick);
+}
+reset();tick();
+</script></body></html>

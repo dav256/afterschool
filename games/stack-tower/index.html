@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Stack Tower</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a12;color:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+h1{font-size:1.2rem;margin:8px 0;color:#9fe8d0}canvas{background:#111;border-radius:12px;max-width:100%;touch-action:none}
+.hud{margin:8px;font-weight:700}.btn{margin-top:10px;padding:10px 20px;border:none;border-radius:999px;background:#9fe8d0;color:#0a0a0a;font-weight:700}
+</style></head><body>
+<h1>Stack Tower</h1>
+<div class="hud" id="score">Score: 0</div>
+<canvas id="c" width="320" height="480"></canvas>
+<button class="btn" id="go">Tap / Click to drop</button>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let blocks=[],cur,dir=1,score=0,over=false,speed=2;
+function newBlock(){
+  const last=blocks[blocks.length-1];
+  const w=last?last.w:120;
+  cur={x:0,y:Math.max(40,480-(blocks.length+1)*24),w,h:22,moving:true};
+  dir=1;speed=Math.min(5,2+score*0.08);
+}
+function reset(){blocks=[{x:100,y:456,w:120,h:22}];score=0;over=false;document.getElementById('score').textContent='Score: 0';newBlock();}
+function drop(){
+  if(over||!cur||!cur.moving)return;
+  cur.moving=false;
+  const last=blocks[blocks.length-1];
+  const left=Math.max(cur.x,last.x),right=Math.min(cur.x+cur.w,last.x+last.w);
+  const nw=right-left;
+  if(nw<=4){over=true;return;}
+  cur.x=left;cur.w=nw;blocks.push(cur);score++;
+  document.getElementById('score').textContent='Score: '+score;
+  // scroll up
+  if(blocks.length>12){blocks.forEach(b=>b.y+=24);blocks.shift();}
+  newBlock();
+}
+canvas.onclick=drop;document.getElementById('go').onclick=drop;
+window.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter')drop();});
+function tick(){
+  ctx.fillStyle='#111';ctx.fillRect(0,0,320,480);
+  if(cur&&cur.moving){cur.x+=dir*speed;if(cur.x<=0||cur.x+cur.w>=320)dir*=-1;}
+  [...blocks,cur].filter(Boolean).forEach((b,i)=>{ctx.fillStyle=`hsl(${(i*40)%360} 70% 55%)`;ctx.fillRect(b.x,b.y,b.w,b.h);});
+  if(over){ctx.fillStyle='#fff';ctx.font='22px system-ui';ctx.textAlign='center';ctx.fillText('Game Over — '+score,160,240);}
+  requestAnimationFrame(tick);
+}
+reset();tick();
+</script></body></html>

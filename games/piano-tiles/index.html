@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Piano Tiles</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a12;color:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh}
+h1{color:#9fe8d0;margin:10px;font-size:1.2rem}#board{display:grid;grid-template-columns:repeat(4,1fr);width:min(360px,100vw);height:70vh;border:2px solid #222;touch-action:none}
+.col{position:relative;border-left:1px solid #222;overflow:hidden}.tile{position:absolute;left:0;right:0;background:#111;border-radius:4px}.tile.black{background:#1a1a1a;border:1px solid #333}.tile.active{background:#9fe8d0}.hud{margin:8px;font-weight:700}.btn{margin:10px;padding:10px 20px;border:none;border-radius:999px;background:#9fe8d0;color:#0a0a0a;font-weight:700}
+</style></head><body>
+<h1>Piano Tiles</h1>
+<div class="hud" id="score">Score: 0</div>
+<div id="board"></div>
+<button class="btn" id="start">Start</button>
+<script>
+const board=document.getElementById('board'),cols=[];
+let tiles=[],score=0,speed=2.2,running=false,raf;
+for(let i=0;i<4;i++){const c=document.createElement('div');c.className='col';board.appendChild(c);cols.push(c);
+  c.addEventListener('pointerdown',()=>hit(i));
+}
+function spawn(){const col=Math.floor(Math.random()*4);tiles.push({col,y:-120,h:110,hit:false});}
+function hit(col){
+  if(!running)return;
+  const t=tiles.find(t=>t.col===col&&!t.hit&&t.y+t.h>board.clientHeight*0.55&&t.y<board.clientHeight);
+  if(t){t.hit=true;score++;document.getElementById('score').textContent='Score: '+score;speed=Math.min(6,2.2+score*0.04);}
+  else{running=false;}
+}
+function loop(){
+  if(!running)return;
+  const H=board.clientHeight;
+  tiles.forEach(t=>t.y+=speed);
+  if(tiles.some(t=>!t.hit&&t.y>H)){running=false;}
+  tiles=tiles.filter(t=>t.y<H+20);
+  if(Math.random()<0.03+score*0.001)spawn();
+  cols.forEach(c=>c.innerHTML='');
+  tiles.forEach(t=>{const d=document.createElement('div');d.className='tile '+(t.hit?'active':'black');d.style.top=t.y+'px';d.style.height=t.h+'px';cols[t.col].appendChild(d);});
+  raf=requestAnimationFrame(loop);
+}
+document.getElementById('start').onclick=()=>{cancelAnimationFrame(raf);tiles=[];score=0;speed=2.2;running=true;document.getElementById('score').textContent='Score: 0';spawn();loop();};
+</script></body></html>

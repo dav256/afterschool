@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Catch Fall</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a12;color:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+h1{color:#9fe8d0;font-size:1.2rem}canvas{background:#0d1117;border-radius:12px;max-width:100%;touch-action:none}.hud{font-weight:700;margin:8px}.btn{margin-top:10px;padding:10px 20px;border:none;border-radius:999px;background:#9fe8d0;color:#0a0a0a;font-weight:700}
+</style></head><body>
+<h1>Catch Fall</h1>
+<div class="hud" id="score">Score: 0 · Lives: 3</div>
+<canvas id="c" width="360" height="480"></canvas>
+<button class="btn" id="restart">Restart</button>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let basket={x:140,w:70,h:14},items=[],score=0,lives=3,spawn=0,over=false;
+function reset(){items=[];score=0;lives=3;over=false;document.getElementById('score').textContent='Score: 0 · Lives: 3';}
+document.getElementById('restart').onclick=reset;
+canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();basket.x=(e.clientX-r.left)*(canvas.width/r.width)-basket.w/2;});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];const r=canvas.getBoundingClientRect();basket.x=(t.clientX-r.left)*(canvas.width/r.width)-basket.w/2;},{passive:false});
+function tick(){
+  ctx.fillStyle='#0d1117';ctx.fillRect(0,0,360,480);
+  if(!over){
+    spawn++;if(spawn%35===0)items.push({x:20+Math.random()*320,y:-20,r:12,vy:2+Math.random()*2+score*0.05,good:Math.random()>0.25});
+    items.forEach(it=>{it.y+=it.vy;
+      if(it.y+it.r>=460&&it.x>basket.x&&it.x<basket.x+basket.w){if(it.good)score++;else lives--;it.y=999;document.getElementById('score').textContent=`Score: ${score} · Lives: ${lives}`;}
+      else if(it.y>500&&it.good){lives--;it.y=999;document.getElementById('score').textContent=`Score: ${score} · Lives: ${lives}`;}
+    });
+    items=items.filter(it=>it.y<600);
+    if(lives<=0)over=true;
+  }
+  ctx.fillStyle='#9fe8d0';ctx.fillRect(basket.x,460,basket.w,basket.h);
+  items.forEach(it=>{ctx.beginPath();ctx.arc(it.x,it.y,it.r,0,Math.PI*2);ctx.fillStyle=it.good?'#22c55e':'#ef4444';ctx.fill();});
+  if(over){ctx.fillStyle='#fff';ctx.font='22px system-ui';ctx.textAlign='center';ctx.fillText('Game Over — '+score,180,240);}
+  requestAnimationFrame(tick);
+}
+reset();tick();
+</script></body></html>

@@ -1,1 +1,65 @@
-PLACEHOLDER_SPACE
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Space Invaders</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a12;color:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+h1{font-size:1.2rem;margin:8px 0;color:#9fe8d0}canvas{background:#050508;border:2px solid #222;border-radius:8px;max-width:100%;touch-action:none}
+.hud{display:flex;gap:20px;margin:8px 0;font-weight:700;font-size:0.95rem}
+.btn{margin-top:10px;padding:10px 20px;border:none;border-radius:999px;background:#9fe8d0;color:#0a0a0a;font-weight:700;cursor:pointer}
+</style></head><body>
+<h1>Space Invaders</h1>
+<div class="hud"><span id="score">Score: 0</span><span id="lives">Lives: 3</span></div>
+<canvas id="c" width="400" height="520"></canvas>
+<button class="btn" id="start">Start / Restart</button>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let ship,bullets,aliens,keys={},score=0,lives=3,over=false,running=false,dir=1,drop=0;
+function reset(){
+  ship={x:180,y:480,w:36,h:16};bullets=[];score=0;lives=3;over=false;running=true;dir=1;
+  aliens=[];
+  for(let r=0;r<5;r++)for(let c=0;c<8;c++)aliens.push({x:30+c*42,y:40+r*36,w:28,h:20,alive:true});
+  document.getElementById('score').textContent='Score: 0';
+  document.getElementById('lives').textContent='Lives: 3';
+}
+document.getElementById('start').onclick=reset;
+window.addEventListener('keydown',e=>{keys[e.key]=true;if(e.key===' '&&running&&!over){bullets.push({x:ship.x+ship.w/2-2,y:ship.y,w:4,h:10});e.preventDefault()}});
+window.addEventListener('keyup',e=>keys[e.key]=false);
+canvas.addEventListener('pointerdown',e=>{
+  if(!running||over)return;
+  const r=canvas.getBoundingClientRect();
+  const x=(e.clientX-r.left)*(canvas.width/r.width);
+  if(x<ship.x)keys.ArrowLeft=true;else if(x>ship.x+ship.w)keys.ArrowRight=true;
+  else bullets.push({x:ship.x+ship.w/2-2,y:ship.y,w:4,h:10});
+});
+canvas.addEventListener('pointerup',()=>{keys.ArrowLeft=false;keys.ArrowRight=false});
+function tick(){
+  ctx.fillStyle='#050508';ctx.fillRect(0,0,400,520);
+  if(!running){requestAnimationFrame(tick);return;}
+  if(over){ctx.fillStyle='#fff';ctx.font='24px system-ui';ctx.textAlign='center';ctx.fillText('Game Over',200,250);ctx.font='14px system-ui';ctx.fillText('Score '+score,200,280);requestAnimationFrame(tick);return;}
+  if(keys.ArrowLeft||keys.a)ship.x=Math.max(0,ship.x-5);
+  if(keys.ArrowRight||keys.d)ship.x=Math.min(400-ship.w,ship.x+5);
+  // move aliens
+  let hitEdge=false;
+  aliens.forEach(a=>{if(!a.alive)return;a.x+=dir*0.6;if(a.x<=0||a.x+a.w>=400)hitEdge=true;});
+  if(hitEdge){dir*=-1;aliens.forEach(a=>{if(a.alive)a.y+=16;});}
+  bullets.forEach(b=>b.y-=7);
+  bullets=bullets.filter(b=>b.y>0);
+  bullets.forEach(b=>{
+    aliens.forEach(a=>{
+      if(a.alive&&b.x< a.x+a.w&&b.x+b.w>a.x&&b.y<a.y+a.h&&b.y+b.h>a.y){a.alive=false;b.y=-99;score+=10;document.getElementById('score').textContent='Score: '+score;}
+    });
+  });
+  // alien reach bottom
+  if(aliens.some(a=>a.alive&&a.y+a.h>=ship.y)){lives=0;over=true;}
+  // draw ship
+  ctx.fillStyle='#9fe8d0';ctx.fillRect(ship.x,ship.y,ship.w,ship.h);
+  ctx.fillStyle='#fff';bullets.forEach(b=>ctx.fillRect(b.x,b.y,b.w,b.h));
+  aliens.forEach(a=>{if(!a.alive)return;ctx.fillStyle='#ef4444';ctx.fillRect(a.x,a.y,a.w,a.h);ctx.fillStyle='#fca5a5';ctx.fillRect(a.x+6,a.y+6,16,8);});
+  if(aliens.every(a=>!a.alive)){// next wave denser
+    for(let r=0;r<5;r++)for(let c=0;c<8;c++)aliens.push({x:30+c*42,y:40+r*36,w:28,h:20,alive:true});
+    dir=Math.sign(dir)*Math.min(2,Math.abs(dir)+0.2);
+  }
+  requestAnimationFrame(tick);
+}
+reset();tick();
+</script></body></html>

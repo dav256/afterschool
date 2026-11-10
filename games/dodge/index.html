@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dodge</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a12;color:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+h1{color:#9fe8d0;font-size:1.2rem}canvas{background:#111;border-radius:12px;max-width:100%;touch-action:none}.hud{font-weight:700;margin:8px}.btn{margin-top:10px;padding:10px 20px;border:none;border-radius:999px;background:#9fe8d0;color:#0a0a0a;font-weight:700}
+</style></head><body>
+<h1>Dodge</h1>
+<div class="hud" id="score">Time: 0.0s</div>
+<canvas id="c" width="360" height="480"></canvas>
+<button class="btn" id="restart">Restart</button>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let player={x:180,y:400,r:14},enemies=[],t0=0,alive=true,spawn=0;
+function reset(){player={x:180,y:400,r:14};enemies=[];alive=true;t0=performance.now();spawn=0;}
+document.getElementById('restart').onclick=reset;
+canvas.addEventListener('pointermove',e=>{if(!alive)return;const r=canvas.getBoundingClientRect();player.x=(e.clientX-r.left)*(canvas.width/r.width);player.y=(e.clientY-r.top)*(canvas.height/r.height);});
+function tick(){
+  ctx.fillStyle='#111';ctx.fillRect(0,0,360,480);
+  const time=((performance.now()-t0)/1000).toFixed(1);
+  if(alive){
+    document.getElementById('score').textContent='Time: '+time+'s';
+    spawn++;if(spawn%20===0){const side=Math.floor(Math.random()*4);let x,y,vx,vy;const s=2+Math.random()*2+parseFloat(time)*0.05;
+      if(side===0){x=Math.random()*360;y=-20;vx=0;vy=s;}else if(side===1){x=Math.random()*360;y=500;vx=0;vy=-s;}else if(side===2){x=-20;y=Math.random()*480;vx=s;vy=0;}else{x=380;y=Math.random()*480;vx=-s;vy=0;}
+      enemies.push({x,y,r:10+Math.random()*10,vx,vy});
+    }
+    enemies.forEach(e=>{e.x+=e.vx;e.y+=e.vy;const dx=e.x-player.x,dy=e.y-player.y;if(dx*dx+dy*dy<(e.r+player.r)*(e.r+player.r))alive=false;});
+    enemies=enemies.filter(e=>e.x>-40&&e.x<400&&e.y>-40&&e.y<520);
+  }
+  ctx.beginPath();ctx.arc(player.x,player.y,player.r,0,Math.PI*2);ctx.fillStyle='#9fe8d0';ctx.fill();
+  enemies.forEach(e=>{ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fillStyle='#ef4444';ctx.fill();});
+  if(!alive){ctx.fillStyle='#fff';ctx.font='22px system-ui';ctx.textAlign='center';ctx.fillText('Survived '+time+'s',180,240);}
+  requestAnimationFrame(tick);
+}
+reset();tick();
+</script></body></html>

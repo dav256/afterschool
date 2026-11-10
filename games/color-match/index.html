@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Color Match</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a12;color:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:16px}
+h1{color:#9fe8d0;margin:8px}#word{font-size:2rem;font-weight:800;margin:20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(320px,100%)}.cell{height:80px;border-radius:16px;border:none;font-size:1rem;font-weight:700;cursor:pointer;color:#fff}.hud{margin:10px;font-weight:700}.btn{margin-top:14px;padding:10px 20px;border:none;border-radius:999px;background:#9fe8d0;color:#0a0a0a;font-weight:700}
+</style></head><body>
+<h1>Color Match</h1>
+<p style="color:#8b8b96;text-align:center">Tap the color of the text, not the word</p>
+<div class="hud" id="score">Score: 0 · Time: 30</div>
+<div id="word">RED</div>
+<div class="grid" id="grid"></div>
+<button class="btn" id="restart">Restart</button>
+<script>
+const names=['RED','BLUE','GREEN','YELLOW','PURPLE','ORANGE'];
+const hex={RED:'#ef4444',BLUE:'#3b82f6',GREEN:'#22c55e',YELLOW:'#eab308',PURPLE:'#a855f7',ORANGE:'#f97316'};
+let score=0,time=30,timer,answer;
+const wordEl=document.getElementById('word'),grid=document.getElementById('grid'),hud=document.getElementById('score');
+function round(){
+  const text=names[Math.floor(Math.random()*names.length)];
+  answer=names[Math.floor(Math.random()*names.length)];
+  wordEl.textContent=text;wordEl.style.color=hex[answer];
+  grid.innerHTML='';
+  const opts=[...names].sort(()=>Math.random()-0.5).slice(0,4);
+  if(!opts.includes(answer))opts[0]=answer;
+  opts.sort(()=>Math.random()-0.5).forEach(c=>{
+    const b=document.createElement('button');b.className='cell';b.style.background=hex[c];b.textContent=c;
+    b.onclick=()=>{if(c===answer){score++;round();}else{time=Math.max(0,time-3);}hud.textContent=`Score: ${score} · Time: ${time}`;};
+    grid.appendChild(b);
+  });
+}
+function start(){
+  score=0;time=30;clearInterval(timer);round();hud.textContent=`Score: 0 · Time: 30`;
+  timer=setInterval(()=>{time--;hud.textContent=`Score: ${score} · Time: ${time}`;if(time<=0){clearInterval(timer);wordEl.textContent='Done! '+score;grid.innerHTML='';}},1000);
+}
+document.getElementById('restart').onclick=start;start();
+</script></body></html>
